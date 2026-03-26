@@ -29,25 +29,27 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 **Bible**
 - [ ] OSIS or USFM XML sources (e.g. eBible.org, Crosswire)
-- [x] Translations: KJV, ASV, WEB, YLT, Darby (public domain) — KJV (31,102 verses) and ASV (31,086 verses) imported via scrollmapper JSON
+- [x] Translations: KJV, ASV, YLT, Darby (public domain) — all 4 imported via scrollmapper JSON (~31,100 verses each)
+- [ ] WEB (World English Bible) — not available in scrollmapper, needs alternate source
 - [ ] Critical translations: NRSV, NJPS (license permitting)
-- [ ] Original languages: Westminster Leningrad Codex (Hebrew), NA28 / SBLGNT (Greek), LXX (Septuagint)
-- [ ] Strongs lexicon (Hebrew & Greek) — 3 sample entries seeded for Genesis 1:1
+- [x] Original languages: SBLGNT (Greek NT, 7,927 verses from MorphGNT)
+- [ ] Original languages: Westminster Leningrad Codex (Hebrew), LXX (Septuagint)
+- [x] Strongs lexicon (Hebrew & Greek) — 8,674 Hebrew + 5,523 Greek entries from OpenScriptures
 - [ ] Dead Sea Scrolls (public domain transcriptions)
 - [ ] Codex Sinaiticus and Vaticanus (digitised, public domain)
 
 **Quran**
-- [x] Tanzil.net XML source (Arabic + translations) — Arabic (6,236 ayahs) and Sahih International imported
-- [ ] Translations: Yusuf Ali, Pickthall, Sahih International — Sahih International done
+- [x] Tanzil.net source (Arabic + translations) — Arabic, Sahih International, Yusuf Ali, Pickthall (6,236 ayahs each)
+- [x] Translations: Yusuf Ali, Pickthall, Sahih International — all three imported
 - [ ] Sana'a manuscript variants (earliest extant Quran fragments)
 
 **Pali Canon**
-- [ ] SuttaCentral data (JSON/XML)
+- [x] SuttaCentral data (JSON) — Dhammapada imported (423 verses, Pali + Bhikkhu Sujato English)
 
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral
 
 ### 1.3 Import pipeline
 

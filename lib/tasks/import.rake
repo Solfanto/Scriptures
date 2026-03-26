@@ -7,11 +7,25 @@ namespace :import do
     sources_dir = Rails.root.join("db/seeds/sources")
 
     downloads = {
+      # scrollmapper/bible_databases — MIT licence
+      # Bible translations are public domain (pre-1923)
       "kjv.json" => "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/KJV.json",
       "asv.json" => "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/ASV.json",
+      "ylt.json" => "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/YLT.json",
+      "darby.json" => "https://raw.githubusercontent.com/scrollmapper/bible_databases/master/formats/json/Darby.json",
+
+      # Tanzil.net — CC BY 3.0 (attribution required: "Tanzil.net")
+      # Quran text is not copyrightable; translations vary by translator
       "quran_arabic.txt" => "https://tanzil.net/pub/download/index.php?quranType=simple&outType=txt-2",
       "quran_sahih.txt" => "https://tanzil.net/trans/en.sahih",
-      "quran-data.xml" => "https://tanzil.net/res/text/metadata/quran-data.xml"
+      "quran_yusufali.txt" => "https://tanzil.net/trans/en.yusufali",
+      "quran_pickthall.txt" => "https://tanzil.net/trans/en.pickthall",
+      "quran-data.xml" => "https://tanzil.net/res/text/metadata/quran-data.xml",
+
+      # openscriptures/strongs — CC BY-SA 3.0
+      # Original Strong's dictionary (1890/1894) is public domain
+      "strongs_hebrew.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/hebrew/strongs-hebrew-dictionary.js",
+      "strongs_greek.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js"
     }
 
     downloads.each do |filename, url|
@@ -30,6 +44,47 @@ namespace :import do
         puts " #{path.size} bytes"
       else
         puts " FAILED (#{response.code})"
+      end
+    end
+
+    # morphgnt/sblgnt — SBLGNT text: SBLGNT EULA; morphological annotations: CC BY-SA 3.0
+    sblgnt_dir = sources_dir.join("sblgnt")
+    sblgnt_dir.mkpath
+    sblgnt_books = %w[61-Mt 62-Mk 63-Lk 64-Jn 65-Ac 66-Ro 67-1Co 68-2Co 69-Ga 70-Eph 71-Php 72-Col 73-1Th 74-2Th 75-1Ti 76-2Ti 77-Tit 78-Phm 79-Heb 80-Jas 81-1Pe 82-2Pe 83-1Jn 84-2Jn 85-3Jn 86-Jud 87-Re]
+    sblgnt_books.each do |book|
+      path = sblgnt_dir.join("#{book}.txt")
+      next if path.exist? && path.size > 100
+
+      print "  fetch sblgnt/#{book}.txt..."
+      uri = URI("https://raw.githubusercontent.com/morphgnt/sblgnt/master/#{book}-morphgnt.txt")
+      response = Net::HTTP.get_response(uri)
+      if response.is_a?(Net::HTTPSuccess)
+        File.write(path, response.body)
+        puts " #{path.size} bytes"
+      else
+        puts " FAILED (#{response.code})"
+      end
+    end
+
+    # suttacentral/bilara-data — Pali root text: public domain; Sujato translation: CC0 1.0
+    dhp_files = %w[dhp1-20 dhp21-32 dhp33-43 dhp44-59 dhp60-75 dhp76-89 dhp90-99 dhp100-115 dhp116-128 dhp129-145 dhp146-156 dhp157-166 dhp167-178 dhp179-196 dhp197-208 dhp209-220 dhp221-234 dhp235-255 dhp256-272 dhp273-289 dhp290-305 dhp306-319 dhp320-333 dhp334-359 dhp360-382 dhp383-423]
+    { "pali" => "root/pli/ms/sutta/kn/dhp/%s_root-pli-ms.json",
+      "en" => "translation/en/sujato/sutta/kn/dhp/%s_translation-en-sujato.json" }.each do |lang_dir, url_pattern|
+      dir = sources_dir.join("suttacentral/dhp/#{lang_dir}")
+      dir.mkpath
+      dhp_files.each do |f|
+        path = dir.join("#{f}.json")
+        next if path.exist? && path.size > 100
+
+        print "  fetch suttacentral/dhp/#{lang_dir}/#{f}.json..."
+        uri = URI("https://raw.githubusercontent.com/suttacentral/bilara-data/published/#{format(url_pattern, f)}")
+        response = Net::HTTP.get_response(uri)
+        if response.is_a?(Net::HTTPSuccess)
+          File.write(path, response.body)
+          puts " #{path.size} bytes"
+        else
+          puts " FAILED (#{response.code})"
+        end
       end
     end
   end
@@ -66,46 +121,80 @@ namespace :import do
     importer.run
   end
 
+  desc "Import a SuttaCentral bilara-data text (Pali + English)"
+  task :suttacentral, [ :pali_dir, :en_dir, :abbreviation, :name, :scripture_name, :scripture_slug ] => :environment do |_t, args|
+    Import::Suttacentral.new(
+      pali_dir: Rails.root.join(args[:pali_dir]),
+      translation_dir: args[:en_dir] ? Rails.root.join(args[:en_dir]) : nil,
+      translation_abbreviation: args[:abbreviation],
+      translation_name: args[:name],
+      scripture_name: args[:scripture_name],
+      scripture_slug: args[:scripture_slug]
+    ).run
+  end
+
+  desc "Import SBLGNT Greek New Testament from MorphGNT word-level files"
+  task :sblgnt, [ :directory ] => :environment do |_t, args|
+    directory = args[:directory] || "db/seeds/sources/sblgnt"
+    Import::Sblgnt.new(directory: Rails.root.join(directory)).run
+  end
+
+  desc "Import Strong's lexicon from OpenScriptures JS format"
+  task :strongs, [ :file, :language ] => :environment do |_t, args|
+    file = args[:file] || raise("Usage: rake import:strongs[file,language]")
+    language = args[:language] || raise("language required (Hebrew or Greek)")
+
+    Import::StrongsLexicon.new(file: Rails.root.join(file), language: language).run
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke
 
     sources = Rails.root.join("db/seeds/sources")
 
-    if sources.join("kjv.json").exist?
-      Import::BibleJson.new(
-        file: sources.join("kjv.json"),
-        abbreviation: "KJV",
-        name: "King James Version",
-        language: "English"
+    # Bible translations
+    {
+      "kjv.json" => [ "KJV", "King James Version", "English" ],
+      "asv.json" => [ "ASV", "American Standard Version", "English" ],
+      "ylt.json" => [ "YLT", "Young's Literal Translation", "English" ],
+      "darby.json" => [ "DBY", "Darby Translation", "English" ]
+    }.each do |file, (abbr, name, lang)|
+      path = sources.join(file)
+      Import::BibleJson.new(file: path, abbreviation: abbr, name: name, language: lang).run if path.exist?
+    end
+
+    # Quran translations
+    {
+      "quran_arabic.txt" => [ "QAR", "Quran (Simple Arabic)", "Arabic" ],
+      "quran_sahih.txt" => [ "SAH", "Sahih International", "English" ],
+      "quran_yusufali.txt" => [ "YAL", "Yusuf Ali", "English" ],
+      "quran_pickthall.txt" => [ "PKT", "Pickthall", "English" ]
+    }.each do |file, (abbr, name, lang)|
+      path = sources.join(file)
+      Import::QuranTanzil.new(file: path, abbreviation: abbr, name: name, language: lang).run if path.exist?
+    end
+
+    # SBLGNT Greek New Testament
+    sblgnt_dir = sources.join("sblgnt")
+    Import::Sblgnt.new(directory: sblgnt_dir).run if sblgnt_dir.exist? && sblgnt_dir.children.any?
+
+    # Pali Canon — Dhammapada
+    dhp_pali = sources.join("suttacentral/dhp/pali")
+    dhp_en = sources.join("suttacentral/dhp/en")
+    if dhp_pali.exist? && dhp_pali.children.any?
+      Import::Suttacentral.new(
+        pali_dir: dhp_pali,
+        translation_dir: dhp_en.exist? ? dhp_en : nil,
+        translation_abbreviation: "SUJ",
+        translation_name: "Bhikkhu Sujato",
+        scripture_name: "Dhammapada",
+        scripture_slug: "dhammapada"
       ).run
     end
 
-    if sources.join("asv.json").exist?
-      Import::BibleJson.new(
-        file: sources.join("asv.json"),
-        abbreviation: "ASV",
-        name: "American Standard Version",
-        language: "English"
-      ).run
-    end
-
-    if sources.join("quran_arabic.txt").exist?
-      Import::QuranTanzil.new(
-        file: sources.join("quran_arabic.txt"),
-        abbreviation: "QAR",
-        name: "Quran (Simple Arabic)",
-        language: "Arabic"
-      ).run
-    end
-
-    if sources.join("quran_sahih.txt").exist?
-      Import::QuranTanzil.new(
-        file: sources.join("quran_sahih.txt"),
-        abbreviation: "SAH",
-        name: "Sahih International",
-        language: "English"
-      ).run
-    end
+    # Strong's lexicons
+    Import::StrongsLexicon.new(file: sources.join("strongs_hebrew.js"), language: "Hebrew").run if sources.join("strongs_hebrew.js").exist?
+    Import::StrongsLexicon.new(file: sources.join("strongs_greek.js"), language: "Greek").run if sources.join("strongs_greek.js").exist?
   end
 end
