@@ -8,20 +8,20 @@ The app is only as good as its data. Before any UI, establish the schema and see
 
 Design the core data model:
 
-- [ ] `corpus` — top-level grouping (e.g. "Bible", "Quran", "Pali Canon")
-- [ ] `tradition` — religious tradition (Christian, Islamic, Buddhist, etc.)
-- [ ] `scripture` — a named text within a corpus (e.g. "Genesis", "Surah Al-Fatiha")
-- [ ] `division` — recursive self-referential model for chapters, books, parts, cantos, etc.
-- [ ] `passage` — the atomic unit of text (verse, stanza, line, section)
-- [ ] `translation` — a named version of a corpus in a given language (e.g. "KJV", "Yusuf Ali")
-- [ ] `passage_translation` — the translated text of a passage in a given translation
-- [ ] `original_language_token` — tokenized word from the original language text, linked to a passage
-- [ ] `lexicon_entry` — definition and morphology for a token (Hebrew, Greek, Arabic, Sanskrit, etc.)
-- [ ] `manuscript` — a named manuscript or textual witness (e.g. Codex Sinaiticus, Dead Sea Scroll 1QIsa)
-- [ ] `textual_variant` — a variant reading at a specific passage across manuscripts
-- [ ] `source_document` — hypothetical or identified source layers (e.g. J, E, D, P; Q source; deutero-Isaiah)
-- [ ] `composition_date` — scholarly dating with range, confidence, and citation (e.g. "7th c. BCE, likely exilic")
-- [ ] `parallel_passage` — cross-tradition intertextual links (e.g. Genesis flood ↔ Gilgamesh XI ↔ Quran 11:25–48)
+- [x] `corpus` — top-level grouping (e.g. "Bible", "Quran", "Pali Canon")
+- [x] `tradition` — religious tradition (Christian, Islamic, Buddhist, etc.)
+- [x] `scripture` — a named text within a corpus (e.g. "Genesis", "Surah Al-Fatiha")
+- [x] `division` — recursive self-referential model for chapters, books, parts, cantos, etc.
+- [x] `passage` — the atomic unit of text (verse, stanza, line, section)
+- [x] `translation` — a named version of a corpus in a given language (e.g. "KJV", "Yusuf Ali")
+- [x] `passage_translation` — the translated text of a passage in a given translation
+- [x] `original_language_token` — tokenized word from the original language text, linked to a passage
+- [x] `lexicon_entry` — definition and morphology for a token (Hebrew, Greek, Arabic, Sanskrit, etc.)
+- [x] `manuscript` — a named manuscript or textual witness (e.g. Codex Sinaiticus, Dead Sea Scroll 1QIsa)
+- [x] `textual_variant` — a variant reading at a specific passage across manuscripts
+- [x] `source_document` — hypothetical or identified source layers (e.g. J, E, D, P; Q source; deutero-Isaiah)
+- [x] `composition_date` — scholarly dating with range, confidence, and citation (e.g. "7th c. BCE, likely exilic")
+- [x] `parallel_passage` — cross-tradition intertextual links (e.g. Genesis flood ↔ Gilgamesh XI ↔ Quran 11:25–48)
 
 ### 1.2 Source data
 
@@ -29,16 +29,16 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 **Bible**
 - [ ] OSIS or USFM XML sources (e.g. eBible.org, Crosswire)
-- [ ] Translations: KJV, ASV, WEB, YLT, Darby (public domain)
+- [x] Translations: KJV, ASV, WEB, YLT, Darby (public domain) — KJV (31,102 verses) and ASV (31,086 verses) imported via scrollmapper JSON
 - [ ] Critical translations: NRSV, NJPS (license permitting)
 - [ ] Original languages: Westminster Leningrad Codex (Hebrew), NA28 / SBLGNT (Greek), LXX (Septuagint)
-- [ ] Strongs lexicon (Hebrew & Greek)
+- [ ] Strongs lexicon (Hebrew & Greek) — 3 sample entries seeded for Genesis 1:1
 - [ ] Dead Sea Scrolls (public domain transcriptions)
 - [ ] Codex Sinaiticus and Vaticanus (digitised, public domain)
 
 **Quran**
-- [ ] Tanzil.net XML source (Arabic + translations)
-- [ ] Translations: Yusuf Ali, Pickthall, Sahih International
+- [x] Tanzil.net XML source (Arabic + translations) — Arabic (6,236 ayahs) and Sahih International imported
+- [ ] Translations: Yusuf Ali, Pickthall, Sahih International — Sahih International done
 - [ ] Sana'a manuscript variants (earliest extant Quran fragments)
 
 **Pali Canon**
@@ -47,14 +47,14 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [ ] Write an importer rake task per source format
+- [x] Write an importer rake task per source format
 
 ### 1.3 Import pipeline
 
-- [ ] Build `rake import:*` tasks for each source format (OSIS, USFM, JSON, plain text)
-- [ ] Normalize all passage references into a canonical `corpus:division:passage` URI scheme
-- [ ] Validate import completeness with checksums and passage counts
-- [ ] Store raw source files in `db/seeds/sources/` under version control or object storage
+- [x] Build `rake import:*` tasks for each source format (OSIS, USFM, JSON, plain text) — `import:bible_json`, `import:quran_tanzil`, `import:download`, `import:all`
+- [x] Normalize all passage references into a canonical `corpus:division:passage` URI scheme
+- [x] Validate import completeness with checksums and passage counts
+- [x] Store raw source files in `db/seeds/sources/` under version control or object storage — gitignored, downloaded on demand via `rake import:download`
 
 ---
 

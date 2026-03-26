@@ -1,0 +1,13 @@
+priestly:
+  name: Priestly Source
+  abbreviation: P
+  color: blue
+  corpus: bible
+  description: The Priestly source (Documentary Hypothesis).
+
+yahwist:
+  name: Yahwist Source
+  abbreviation: J
+  color: amber
+  corpus: bible
+  description: The Yahwist source.

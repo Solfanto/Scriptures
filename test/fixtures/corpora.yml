@@ -1,0 +1,20 @@
+_fixture:
+  model_class: Corpus
+
+bible:
+  name: Bible
+  slug: bible
+  tradition: jewish
+  description: The Hebrew Bible / Old Testament.
+
+new_testament:
+  name: New Testament
+  slug: new-testament
+  tradition: christian
+  description: The Christian New Testament.
+
+quran:
+  name: Quran
+  slug: quran
+  tradition: islamic
+  description: The central religious text of Islam.

@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_234427) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
+  create_table "composition_dates", force: :cascade do |t|
+    t.text "citation"
+    t.string "confidence"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "earliest_year"
+    t.integer "latest_year"
+    t.integer "scripture_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scripture_id"], name: "index_composition_dates_on_scripture_id"
+  end
+
   create_table "corpora", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -32,6 +44,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_234427) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
     t.index ["scripture_id"], name: "index_divisions_on_scripture_id"
+  end
+
+  create_table "lexicon_entries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "definition"
+    t.string "language", null: false
+    t.string "lemma", null: false
+    t.string "morphology_label"
+    t.string "strongs_number"
+    t.string "transliteration"
+    t.datetime "updated_at", null: false
+    t.index ["lemma", "language"], name: "index_lexicon_entries_on_lemma_and_language"
+    t.index ["strongs_number"], name: "index_lexicon_entries_on_strongs_number", unique: true
+  end
+
+  create_table "manuscripts", force: :cascade do |t|
+    t.string "abbreviation", null: false
+    t.integer "corpus_id", null: false
+    t.datetime "created_at", null: false
+    t.string "date_description"
+    t.text "description"
+    t.string "language"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["corpus_id", "abbreviation"], name: "index_manuscripts_on_corpus_id_and_abbreviation", unique: true
+    t.index ["corpus_id"], name: "index_manuscripts_on_corpus_id"
+  end
+
+  create_table "original_language_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "lemma"
+    t.integer "lexicon_entry_id"
+    t.string "morphology"
+    t.integer "passage_id", null: false
+    t.integer "position", null: false
+    t.string "text", null: false
+    t.string "transliteration"
+    t.datetime "updated_at", null: false
+    t.index ["lexicon_entry_id"], name: "index_original_language_tokens_on_lexicon_entry_id"
+    t.index ["passage_id", "position"], name: "index_original_language_tokens_on_passage_id_and_position", unique: true
+    t.index ["passage_id"], name: "index_original_language_tokens_on_passage_id"
+  end
+
+  create_table "parallel_passages", force: :cascade do |t|
+    t.text "citation"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "parallel_passage_id", null: false
+    t.integer "passage_id", null: false
+    t.string "relationship_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parallel_passage_id"], name: "index_parallel_passages_on_parallel_passage_id"
+    t.index ["passage_id", "parallel_passage_id"], name: "index_parallel_passages_on_passage_id_and_parallel_passage_id", unique: true
+    t.index ["passage_id"], name: "index_parallel_passages_on_passage_id"
   end
 
   create_table "passage_source_documents", force: :cascade do |t|
@@ -86,6 +152,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_234427) do
     t.index ["corpus_id"], name: "index_source_documents_on_corpus_id"
   end
 
+  create_table "textual_variants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "manuscript_id", null: false
+    t.text "notes"
+    t.integer "passage_id", null: false
+    t.text "text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["manuscript_id"], name: "index_textual_variants_on_manuscript_id"
+    t.index ["passage_id", "manuscript_id"], name: "index_textual_variants_on_passage_id_and_manuscript_id", unique: true
+    t.index ["passage_id"], name: "index_textual_variants_on_passage_id"
+  end
+
   create_table "traditions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -106,9 +184,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_234427) do
     t.index ["corpus_id"], name: "index_translations_on_corpus_id"
   end
 
+  add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
+  add_foreign_key "manuscripts", "corpora", column: "corpus_id"
+  add_foreign_key "original_language_tokens", "lexicon_entries"
+  add_foreign_key "original_language_tokens", "passages"
+  add_foreign_key "parallel_passages", "passages"
+  add_foreign_key "parallel_passages", "passages", column: "parallel_passage_id"
   add_foreign_key "passage_source_documents", "passages"
   add_foreign_key "passage_source_documents", "source_documents"
   add_foreign_key "passage_translations", "passages"
@@ -116,5 +200,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_234427) do
   add_foreign_key "passages", "divisions"
   add_foreign_key "scriptures", "corpora", column: "corpus_id"
   add_foreign_key "source_documents", "corpora", column: "corpus_id"
+  add_foreign_key "textual_variants", "manuscripts"
+  add_foreign_key "textual_variants", "passages"
   add_foreign_key "translations", "corpora", column: "corpus_id"
 end

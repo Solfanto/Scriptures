@@ -1,0 +1,14 @@
+genesis_one_one:
+  division: genesis_one
+  number: 1
+  position: 1
+
+genesis_one_two:
+  division: genesis_one
+  number: 2
+  position: 2
+
+genesis_one_three:
+  division: genesis_one
+  number: 3
+  position: 3

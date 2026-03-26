@@ -1,0 +1,23 @@
+bereshit:
+  lemma: "רֵאשִׁית"
+  language: Hebrew
+  transliteration: reshith
+  definition: "Beginning, first, chief."
+  morphology_label: "noun, feminine, singular, construct"
+  strongs_number: H7225
+
+bara:
+  lemma: "בָּרָא"
+  language: Hebrew
+  transliteration: bara
+  definition: "To create, to shape, to form."
+  morphology_label: "verb, Qal, perfect, 3ms"
+  strongs_number: H1254
+
+elohim:
+  lemma: "אֱלֹהִים"
+  language: Hebrew
+  transliteration: elohim
+  definition: "God, gods, divine beings."
+  morphology_label: "noun, masculine, plural"
+  strongs_number: H430

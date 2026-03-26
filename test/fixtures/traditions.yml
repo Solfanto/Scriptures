@@ -1,0 +1,14 @@
+jewish:
+  name: Jewish
+  slug: jewish
+  description: The Jewish scriptural tradition.
+
+christian:
+  name: Christian
+  slug: christian
+  description: The Christian scriptural tradition.
+
+islamic:
+  name: Islamic
+  slug: islamic
+  description: The Islamic scriptural tradition.

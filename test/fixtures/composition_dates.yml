@@ -1,0 +1,15 @@
+genesis_date:
+  scripture: genesis
+  earliest_year: -950
+  latest_year: -450
+  confidence: medium
+  description: "Composite text spanning centuries of composition and redaction."
+  citation: "Friedman, R.E. (1987). Who Wrote the Bible?"
+
+mark_date:
+  scripture: mark
+  earliest_year: 66
+  latest_year: 74
+  confidence: high
+  description: "Widely considered the earliest canonical Gospel."
+  citation: "Marcus, J. (2000). Mark 1-8. Anchor Yale Bible."

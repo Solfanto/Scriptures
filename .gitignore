@@ -37,3 +37,7 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Source data files (large, downloaded on demand via rake import:download)
+/db/seeds/sources/*
+!/db/seeds/sources/.keep

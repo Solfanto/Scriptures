@@ -1,0 +1,11 @@
+kjv:
+  name: King James Version
+  abbreviation: KJV
+  language: English
+  corpus: bible
+
+wlc:
+  name: Westminster Leningrad Codex
+  abbreviation: WLC
+  language: Hebrew
+  corpus: bible

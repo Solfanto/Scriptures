@@ -1,0 +1,13 @@
+genesis:
+  name: Genesis
+  slug: genesis
+  corpus: bible
+  position: 1
+  description: The first book of the Torah/Pentateuch.
+
+mark:
+  name: Mark
+  slug: mark
+  corpus: new_testament
+  position: 2
+  description: The earliest canonical Gospel.

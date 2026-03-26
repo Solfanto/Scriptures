@@ -1,0 +1,26 @@
+bereshit_token:
+  passage: genesis_one_one
+  position: 1
+  text: "בְּרֵאשִׁית"
+  transliteration: bereshith
+  lemma: "רֵאשִׁית"
+  morphology: "prep+n-fs-c"
+  lexicon_entry: bereshit
+
+bara_token:
+  passage: genesis_one_one
+  position: 2
+  text: "בָּרָא"
+  transliteration: bara
+  lemma: "בָּרָא"
+  morphology: "v-Qp3ms"
+  lexicon_entry: bara
+
+elohim_token:
+  passage: genesis_one_one
+  position: 3
+  text: "אֱלֹהִים"
+  transliteration: elohim
+  lemma: "אֱלֹהִים"
+  morphology: "n-mp"
+  lexicon_entry: elohim

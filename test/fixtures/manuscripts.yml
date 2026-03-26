@@ -1,0 +1,15 @@
+sinaiticus:
+  name: Codex Sinaiticus
+  abbreviation: "01"
+  date_description: "4th century CE"
+  language: Greek
+  corpus: bible
+  description: One of the oldest nearly complete manuscripts of the Greek Bible.
+
+vaticanus:
+  name: Codex Vaticanus
+  abbreviation: "03"
+  date_description: "4th century CE"
+  language: Greek
+  corpus: bible
+  description: One of the oldest extant manuscripts of the Greek Bible.
