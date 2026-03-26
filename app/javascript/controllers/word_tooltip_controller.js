@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  #tooltip = null
+
   show(event) {
     const word = event.currentTarget.dataset.word
     if (!word) return
@@ -11,7 +13,7 @@ export default class extends Controller {
     tooltip.className = "word-tooltip fixed z-50 p-4 w-64 text-sm shadow-xl rounded-lg border bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700"
     tooltip.innerHTML = `
       <div class="flex justify-between items-start mb-2">
-        <span class="text-xl font-serif rtl">${this.escapeHTML(word)}</span>
+        <span class="text-xl font-serif rtl">${this.#escapeHTML(word)}</span>
         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300">Word</span>
       </div>
       <p class="text-xs text-stone-500 italic">Click for word study (coming soon)</p>
@@ -33,13 +35,13 @@ export default class extends Controller {
     tooltip.style.top = `${top}px`
     tooltip.style.left = `${left}px`
 
-    this.currentTooltip = tooltip
+    this.#tooltip = tooltip
   }
 
   hide() {
-    if (this.currentTooltip) {
-      this.currentTooltip.remove()
-      this.currentTooltip = null
+    if (this.#tooltip) {
+      this.#tooltip.remove()
+      this.#tooltip = null
     }
   }
 
@@ -47,7 +49,7 @@ export default class extends Controller {
     this.hide()
   }
 
-  escapeHTML(str) {
+  #escapeHTML(str) {
     const div = document.createElement("div")
     div.textContent = str
     return div.innerHTML

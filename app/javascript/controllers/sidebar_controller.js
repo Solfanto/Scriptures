@@ -3,25 +3,23 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["sidebar", "overlay", "label"]
 
-  connect() {
-    this.expanded = true
-  }
+  #expanded = true
 
   toggle() {
-    this.expanded = !this.expanded
+    this.#expanded = !this.#expanded
 
     if (window.innerWidth < 768) {
-      this.applyMobile()
+      this.#applyMobile()
     } else {
-      this.applyDesktop()
+      this.#applyDesktop()
     }
   }
 
-  applyMobile() {
+  #applyMobile() {
     const sidebar = this.sidebarTarget
     sidebar.style.removeProperty("width")
 
-    if (this.expanded) {
+    if (this.#expanded) {
       sidebar.classList.remove("-translate-x-full")
       sidebar.classList.add("translate-x-0")
       this.overlayTarget.style.removeProperty("display")
@@ -32,12 +30,12 @@ export default class extends Controller {
     }
   }
 
-  applyDesktop() {
+  #applyDesktop() {
     const sidebar = this.sidebarTarget
-    sidebar.style.width = this.expanded ? "16rem" : "5rem"
+    sidebar.style.width = this.#expanded ? "16rem" : "5rem"
 
-    this.labelTargets.forEach(function(el) {
-      el.style.display = this.expanded ? "" : "none"
-    }.bind(this))
+    this.labelTargets.forEach((el) => {
+      el.style.display = this.#expanded ? "" : "none"
+    })
   }
 }
