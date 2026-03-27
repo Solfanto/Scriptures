@@ -25,7 +25,11 @@ namespace :import do
       # openscriptures/strongs — CC BY-SA 3.0
       # Original Strong's dictionary (1890/1894) is public domain
       "strongs_hebrew.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/hebrew/strongs-hebrew-dictionary.js",
-      "strongs_greek.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js"
+      "strongs_greek.js" => "https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js",
+
+      # brando130/BiblicalDSS — CC BY-NC 4.0 (non-commercial, attribution required)
+      # Biblical Dead Sea Scrolls transcriptions derived from ETCBC/dss
+      "biblical_dss.json" => "https://raw.githubusercontent.com/brando130/BiblicalDSS/main/biblical_dss_unicode.json"
     }
 
     downloads.each do |filename, url|
@@ -133,6 +137,12 @@ namespace :import do
     ).run
   end
 
+  desc "Import Dead Sea Scrolls from BiblicalDSS JSON"
+  task :dead_sea_scrolls, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/biblical_dss.json"
+    Import::DeadSeaScrolls.new(file: Rails.root.join(file)).run
+  end
+
   desc "Import SBLGNT Greek New Testament from MorphGNT word-level files"
   task :sblgnt, [ :directory ] => :environment do |_t, args|
     directory = args[:directory] || "db/seeds/sources/sblgnt"
@@ -192,6 +202,10 @@ namespace :import do
         scripture_slug: "dhammapada"
       ).run
     end
+
+    # Dead Sea Scrolls
+    dss_file = sources.join("biblical_dss.json")
+    Import::DeadSeaScrolls.new(file: dss_file).run if dss_file.exist?
 
     # Strong's lexicons
     Import::StrongsLexicon.new(file: sources.join("strongs_hebrew.js"), language: "Hebrew").run if sources.join("strongs_hebrew.js").exist?

@@ -35,7 +35,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 - [x] Original languages: SBLGNT (Greek NT, 7,927 verses from MorphGNT)
 - [ ] Original languages: Westminster Leningrad Codex (Hebrew), LXX (Septuagint)
 - [x] Strongs lexicon (Hebrew & Greek) — 8,674 Hebrew + 5,523 Greek entries from OpenScriptures
-- [ ] Dead Sea Scrolls (public domain transcriptions)
+- [x] Dead Sea Scrolls (public domain transcriptions) — 266 manuscripts, 11,711 passage variants from BiblicalDSS (CC BY-NC 4.0)
 - [ ] Codex Sinaiticus and Vaticanus (digitised, public domain)
 
 **Quran**
