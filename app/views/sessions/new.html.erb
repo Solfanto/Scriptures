@@ -1,0 +1,37 @@
+<div class="flex items-center justify-center h-full p-8">
+  <div class="w-full max-w-sm">
+    <% if alert = flash[:alert] %>
+      <p class="py-2 px-3 bg-red-50 dark:bg-red-950 mb-5 text-red-600 dark:text-red-400 text-sm font-medium rounded-lg" id="alert"><%= alert %></p>
+    <% end %>
+
+    <% if notice = flash[:notice] %>
+      <p class="py-2 px-3 bg-green-50 dark:bg-green-950 mb-5 text-green-600 dark:text-green-400 text-sm font-medium rounded-lg" id="notice"><%= notice %></p>
+    <% end %>
+
+    <h1 class="font-bold text-2xl mb-1">Sign in</h1>
+    <p class="text-stone-500 dark:text-stone-400 text-sm mb-6">Enter your email to receive a sign-in link.</p>
+
+    <%= form_with url: session_url, class: "space-y-4" do |form| %>
+      <div>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "email", placeholder: "you@example.com", value: params[:email_address], class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+      </div>
+
+      <%= form.submit "Send sign-in link", class: "w-full rounded-lg px-3 py-2.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-medium cursor-pointer hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+    <% end %>
+
+    <div class="relative my-6">
+      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-stone-200 dark:border-stone-800"></div></div>
+      <div class="relative flex justify-center text-xs"><span class="bg-stone-50 dark:bg-stone-950 px-2 text-stone-400">or</span></div>
+    </div>
+
+    <button data-controller="passkey-authenticate"
+            data-action="click->passkey-authenticate#authenticate"
+            class="w-full rounded-lg px-3 py-2.5 border border-stone-300 dark:border-stone-700 text-sm font-medium hover:bg-stone-50 dark:hover:bg-stone-900 transition-colors">
+      Sign in with a passkey
+    </button>
+
+    <p class="text-center text-stone-400 dark:text-stone-500 text-xs mt-6">
+      No account needed — we'll create one automatically.
+    </p>
+  </div>
+</div>

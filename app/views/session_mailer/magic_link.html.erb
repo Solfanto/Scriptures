@@ -1,0 +1,7 @@
+<p>Hi<%= @user.display_name ? " #{@user.display_name}" : "" %>,</p>
+
+<p>Click the link below to sign in to Scriptures. This link expires in 15 minutes.</p>
+
+<p><%= link_to "Sign in", @url %></p>
+
+<p>If you didn't request this link, you can safely ignore this email.</p>

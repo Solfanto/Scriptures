@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_101346) do
   create_table "composition_dates", force: :cascade do |t|
     t.text "citation"
     t.string "confidence"
@@ -57,6 +57,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
     t.datetime "updated_at", null: false
     t.index ["lemma", "language"], name: "index_lexicon_entries_on_lemma_and_language"
     t.index ["strongs_number"], name: "index_lexicon_entries_on_strongs_number", unique: true
+  end
+
+  create_table "magic_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["token"], name: "index_magic_tokens_on_token", unique: true
+    t.index ["user_id"], name: "index_magic_tokens_on_user_id"
   end
 
   create_table "manuscripts", force: :cascade do |t|
@@ -129,6 +139,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
     t.index ["division_id"], name: "index_passages_on_division_id"
   end
 
+  create_table "passkey_credentials", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.string "label"
+    t.text "public_key", null: false
+    t.integer "sign_count", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["external_id"], name: "index_passkey_credentials_on_external_id", unique: true
+    t.index ["user_id"], name: "index_passkey_credentials_on_user_id"
+  end
+
   create_table "scriptures", force: :cascade do |t|
     t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
@@ -139,6 +161,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
     t.datetime "updated_at", null: false
     t.index ["corpus_id", "slug"], name: "index_scriptures_on_corpus_id_and_slug", unique: true
     t.index ["corpus_id"], name: "index_scriptures_on_corpus_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "source_documents", force: :cascade do |t|
@@ -184,10 +215,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
     t.index ["corpus_id"], name: "index_translations_on_corpus_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "default_corpus_slug"
+    t.string "default_translation_abbreviation"
+    t.string "display_name"
+    t.string "email_address", null: false
+    t.string "language", default: "en"
+    t.string "password_digest"
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
+  add_foreign_key "magic_tokens", "users"
   add_foreign_key "manuscripts", "corpora", column: "corpus_id"
   add_foreign_key "original_language_tokens", "lexicon_entries"
   add_foreign_key "original_language_tokens", "passages"
@@ -198,7 +242,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_114043) do
   add_foreign_key "passage_translations", "passages"
   add_foreign_key "passage_translations", "translations"
   add_foreign_key "passages", "divisions"
+  add_foreign_key "passkey_credentials", "users"
   add_foreign_key "scriptures", "corpora", column: "corpus_id"
+  add_foreign_key "sessions", "users"
   add_foreign_key "source_documents", "corpora", column: "corpus_id"
   add_foreign_key "textual_variants", "manuscripts"
   add_foreign_key "textual_variants", "passages"

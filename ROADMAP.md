@@ -62,10 +62,10 @@ Prioritise critical editions and scholarly sources over devotional translations:
 
 ## Phase 2 — Authentication & accounts
 
-- [ ] Magic link login — enter email, receive a one-time sign-in link
-- [ ] Passkey support — register and authenticate via WebAuthn (Face ID, Touch ID, hardware keys)
-- [ ] Account settings (display name, default corpus, default translation, language)
-- [ ] Guest mode — read-only access without an account
+- [x] Magic link login — enter email, receive a one-time sign-in link
+- [x] Passkey support — register and authenticate via WebAuthn (Face ID, Touch ID, hardware keys)
+- [x] Account settings (display name, default corpus, default translation, language)
+- [x] Guest mode — read-only access without an account
 
 ---
 
