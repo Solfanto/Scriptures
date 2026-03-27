@@ -20,10 +20,13 @@ class SearchController < ApplicationController
     return PassageTranslation.none if @query.blank?
 
     tsquery = sanitize_tsquery(@query)
+    rank_sql = ActiveRecord::Base.sanitize_sql_array(
+      [ "ts_rank(search_vector, to_tsquery('simple', ?)) DESC", tsquery ]
+    )
     scope = PassageTranslation
       .where("search_vector @@ to_tsquery('simple', ?)", tsquery)
       .includes(passage: { division: { scripture: { corpus: :tradition } } }, translation: {})
-      .order(Arel.sql("ts_rank(search_vector, to_tsquery('simple', '#{tsquery}')) DESC"))
+      .order(Arel.sql(rank_sql))
 
     scope = apply_scope_filter(scope)
     @total = scope.size
