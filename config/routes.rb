@@ -31,6 +31,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # Study tools
+  resources :parallel_passages, only: :create
+  get "word_study/:passage_id/:position", to: "word_studies#show", as: :word_study
+  get "concordance/:id", to: "word_studies#concordance", as: :concordance
+
   # Search & jump-to-reference
   get "search", to: "search#index", as: :search
   get "jump", to: "passages#jump", as: :jump

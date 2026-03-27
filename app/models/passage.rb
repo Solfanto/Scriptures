@@ -7,6 +7,7 @@ class Passage < ApplicationRecord
   has_many :original_language_tokens, dependent: :destroy
   has_many :textual_variants, dependent: :destroy
   has_many :parallel_passages, dependent: :destroy
+  has_many :commentaries, dependent: :destroy
 
   default_scope { order(:position) }
 

@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :annotations, dependent: :destroy
   has_many :tags, dependent: :destroy
   has_many :collections, dependent: :destroy
+  has_many :parallel_passages, dependent: :nullify
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

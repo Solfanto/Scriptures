@@ -12,7 +12,11 @@ class PassagesController < ApplicationController
     end
 
     @tradition = @corpus.tradition
-    @passages = @division.passages.includes(:passage_translations, :translations, :source_documents, :textual_variants)
+    @passages = @division.passages.includes(
+      :passage_translations, :translations, :source_documents,
+      :textual_variants, :original_language_tokens, :commentaries,
+      parallel_passages: { parallel_passage: { division: { scripture: :corpus } } }
+    )
     @translations = @corpus.translations.order(:language, :name)
     @source_documents = @corpus.source_documents
 

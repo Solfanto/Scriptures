@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_205331) do
   create_table "annotation_tags", force: :cascade do |t|
     t.integer "annotation_id", null: false
     t.datetime "created_at", null: false
@@ -61,6 +61,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_collections_on_user_id"
+  end
+
+  create_table "commentaries", force: :cascade do |t|
+    t.string "author", null: false
+    t.text "body", null: false
+    t.string "commentary_type", null: false
+    t.datetime "created_at", null: false
+    t.integer "passage_id", null: false
+    t.string "source"
+    t.datetime "updated_at", null: false
+    t.index ["passage_id", "commentary_type"], name: "index_commentaries_on_passage_id_and_commentary_type"
+    t.index ["passage_id"], name: "index_commentaries_on_passage_id"
   end
 
   create_table "composition_dates", force: :cascade do |t|
@@ -172,9 +184,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
     t.integer "passage_id", null: false
     t.string "relationship_type", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["parallel_passage_id"], name: "index_parallel_passages_on_parallel_passage_id"
     t.index ["passage_id", "parallel_passage_id"], name: "index_parallel_passages_on_passage_id_and_parallel_passage_id", unique: true
     t.index ["passage_id"], name: "index_parallel_passages_on_passage_id"
+    t.index ["user_id"], name: "index_parallel_passages_on_user_id"
   end
 
   create_table "passage_source_documents", force: :cascade do |t|
@@ -313,6 +327,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
   add_foreign_key "collection_passages", "collections"
   add_foreign_key "collection_passages", "passages"
   add_foreign_key "collections", "users"
+  add_foreign_key "commentaries", "passages"
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
   add_foreign_key "divisions", "divisions", column: "parent_id"
@@ -326,6 +341,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_203452) do
   add_foreign_key "original_language_tokens", "passages"
   add_foreign_key "parallel_passages", "passages"
   add_foreign_key "parallel_passages", "passages", column: "parallel_passage_id"
+  add_foreign_key "parallel_passages", "users"
   add_foreign_key "passage_source_documents", "passages"
   add_foreign_key "passage_source_documents", "source_documents"
   add_foreign_key "passage_translations", "passages"
