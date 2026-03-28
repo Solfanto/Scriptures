@@ -23,7 +23,13 @@ Rails.application.routes.draw do
   # Organization
   resources :bookmarks, only: %i[index create destroy]
   resources :highlights, only: %i[create destroy]
-  resources :annotations, only: %i[index create update destroy]
+  resources :annotations, only: %i[index create update destroy] do
+    collection do
+      get :export
+      post :import
+    end
+  end
+  get "annotations/shared/:user_id", to: "annotations#public_set", as: :public_annotations
   resources :collections, only: %i[index show create update destroy] do
     member do
       post :add_passage
@@ -50,6 +56,10 @@ Rails.application.routes.draw do
   resources :ratings, only: :create
   get "word_study/:passage_id/:position", to: "word_studies#show", as: :word_study
   get "concordance/:id", to: "word_studies#concordance", as: :concordance
+
+  # Export (collection route must come before passages to avoid slug matching)
+  get "export/collection/:id", to: "exports#collection", as: :export_collection
+  get "export/:corpus_slug/:scripture_slug", to: "exports#passages", as: :export_passages
 
   # Search & jump-to-reference
   get "search", to: "search#index", as: :search

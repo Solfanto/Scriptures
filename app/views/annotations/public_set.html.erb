@@ -1,0 +1,45 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-bold text-2xl">Shared Annotations</h1>
+      <p class="text-sm text-stone-500 mt-1">by <%= @user.display_name.presence || @user.email_address %></p>
+    </div>
+  </div>
+
+  <%# Tag filter %>
+  <% if @tags.any? %>
+    <div class="flex flex-wrap items-center gap-2 mb-6 text-xs">
+      <% @tags.each do |tag| %>
+        <%= link_to tag.name, public_annotations_path(user_id: @user, tag: tag.name),
+              class: "px-2 py-0.5 rounded-full border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors #{params[:tag] == tag.name ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-transparent' : ''}" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @annotations.any? %>
+    <div class="space-y-4">
+      <% @annotations.each do |annotation| %>
+        <% passage = annotation.passage %>
+        <% scripture = annotation.scripture %>
+        <% corpus = scripture.corpus %>
+        <div class="p-4 border border-stone-200 dark:border-stone-800 rounded-xl">
+          <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: passage.division.number),
+                class: "text-xs font-bold text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 uppercase tracking-wider" do %>
+            <%= scripture.name %> <%= passage.division.number %>:<%= passage.number %>
+          <% end %>
+          <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300 mt-2"><%= annotation.body %></p>
+          <% if annotation.tags.any? %>
+            <div class="flex flex-wrap gap-1 mt-2">
+              <% annotation.tags.each do |tag| %>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400"><%= tag.name %></span>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="text-[10px] text-stone-400 mt-2"><%= time_ago_in_words(annotation.created_at) %> ago</div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-stone-500 text-sm">No public annotations shared by this user.</p>
+  <% end %>
+</div>

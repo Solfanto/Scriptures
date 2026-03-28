@@ -48,6 +48,33 @@
             class: "px-2 py-1 rounded-md font-medium transition-colors #{params[:diff].present? ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900' : 'text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900'}",
             data: { turbo_action: "replace" } %>
 
+      <%# PDF export %>
+      <details class="relative">
+        <summary class="px-2 py-1 rounded-md font-medium text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer list-none">PDF</summary>
+        <div class="absolute left-0 top-8 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg p-4 min-w-64">
+          <%= form_with url: export_passages_path(corpus_slug: @corpus.slug, scripture_slug: @scripture.slug, format: :pdf), method: :get, class: "space-y-3" do |f| %>
+            <div class="flex items-center gap-2">
+              <%= f.label :from_chapter, "From ch.", class: "text-xs text-stone-500 w-14" %>
+              <%= f.number_field :from_chapter, value: @division.number, min: 1, class: "w-16 rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs" %>
+              <%= f.label :to_chapter, "to", class: "text-xs text-stone-500" %>
+              <%= f.number_field :to_chapter, value: @division.number, min: 1, class: "w-16 rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs" %>
+            </div>
+            <% @selected_translations.each do |t| %>
+              <%= f.hidden_field :t, value: t.abbreviation, multiple: true %>
+            <% end %>
+            <div class="space-y-1.5">
+              <label class="flex items-center gap-2 text-xs"><%= check_box_tag :parallel, "1", @parallel %> Parallel translations</label>
+              <label class="flex items-center gap-2 text-xs"><%= check_box_tag :sources, "1" %> Source criticism</label>
+              <label class="flex items-center gap-2 text-xs"><%= check_box_tag :commentary, "1" %> Commentary</label>
+              <% if authenticated? %>
+                <label class="flex items-center gap-2 text-xs"><%= check_box_tag :annotations, "1" %> My annotations</label>
+              <% end %>
+            </div>
+            <%= f.submit "Download PDF", class: "w-full rounded-md px-3 py-1.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium cursor-pointer hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+          <% end %>
+        </div>
+      </details>
+
       <%# Jump-to-reference %>
       <div class="ml-auto">
         <%= form_with url: jump_path, method: :get, class: "flex items-center gap-1" do |f| %>
@@ -149,7 +176,14 @@
         <%# === STANDARD VIEW === %>
         <div class="space-y-8 md:space-y-12">
           <% @passages.each do |passage| %>
-            <div class="group relative" data-controller="word-tooltip passage-actions">
+            <div class="group relative" data-controller="word-tooltip passage-actions citation"
+                 data-citation-scripture-value="<%= @scripture.name %>"
+                 data-citation-chapter-value="<%= @division.number %>"
+                 data-citation-verse-value="<%= passage.number %>"
+                 data-citation-corpus-value="<%= @corpus.name %>"
+                 data-citation-translation-value="<%= @selected_translations.first&.abbreviation %>"
+                 data-citation-text-value="<%= passage.text_for(@selected_translations.first) %>"
+            >
               <div class="flex flex-col md:flex-row gap-2 md:gap-6">
                 <span class="text-xs font-mono text-stone-400 mt-2 w-4 shrink-0"><%= passage.number %></span>
                 <div class="space-y-4 flex-1">
@@ -176,6 +210,25 @@
                       </p>
                     <% end %>
                   <% end %>
+                  <%# Citation copy button (available to all users) %>
+                  <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="relative">
+                      <button data-action="click->citation#toggle" class="text-xs text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" title="Copy citation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                      </button>
+                      <span data-citation-target="feedback" style="display: none" class="text-[10px] text-green-600 dark:text-green-400 ml-1">Copied!</span>
+                      <div data-citation-target="menu" style="display: none" class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-44">
+                        <button data-action="click->citation#copyPlain" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">Plain text</button>
+                        <button data-action="click->citation#copyMLA" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">MLA</button>
+                        <button data-action="click->citation#copyChicago" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">Chicago</button>
+                        <button data-action="click->citation#copyTurabian" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">Turabian</button>
+                        <div class="border-t border-stone-100 dark:border-stone-800 my-1"></div>
+                        <button data-action="click->citation#copyMarkdown" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">Markdown</button>
+                        <button data-action="click->citation#copyHTML" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">HTML</button>
+                      </div>
+                    </div>
+                  </div>
+
                   <%# Passage action buttons (bookmark, annotate, collect) %>
                   <% if authenticated? %>
                     <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_202541) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_225803) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -28,6 +28,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_202541) do
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.integer "passage_id", null: false
+    t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["passage_id"], name: "index_annotations_on_passage_id"
@@ -385,7 +386,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_202541) do
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
   add_foreign_key "curricula", "users"
-  add_foreign_key "curriculum_items", "curricula", column: "curriculum_id"
+  add_foreign_key "curriculum_items", "curricula"
   add_foreign_key "curriculum_items", "passages"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"

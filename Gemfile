@@ -25,6 +25,11 @@ gem "bcrypt", "~> 3.1.7"
 gem "webauthn"
 # Word-level diffing for translation comparison [https://github.com/halostatue/diff-lcs]
 gem "diff-lcs"
+# PDF generation [https://github.com/prawnpdf/prawn]
+gem "prawn"
+gem "prawn-table"
+# CSV generation (no longer in Ruby stdlib since 3.4)
+gem "csv"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

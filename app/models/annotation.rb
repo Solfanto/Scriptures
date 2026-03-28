@@ -6,6 +6,8 @@ class Annotation < ApplicationRecord
 
   validates :body, presence: true
 
+  scope :publicly_visible, -> { where(public: true) }
+
   default_scope { order(created_at: :desc) }
 
   delegate :division, to: :passage
