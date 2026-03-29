@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   # Authentication
   resource :session, only: %i[new create destroy] do
     get "magic_token", on: :member
+    get "verify", on: :member
+    post "verify_code", on: :member
   end
   resource :account, only: %i[show update]
   resources :passkey_credentials, only: %i[create destroy] do

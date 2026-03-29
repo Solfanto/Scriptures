@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_225803) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -167,11 +167,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_225803) do
   end
 
   create_table "magic_tokens", force: :cascade do |t|
+    t.string "browser_token", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
+    t.string "short_code", default: "", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["browser_token"], name: "index_magic_tokens_on_browser_token"
+    t.index ["short_code"], name: "index_magic_tokens_on_short_code"
     t.index ["token"], name: "index_magic_tokens_on_token", unique: true
     t.index ["user_id"], name: "index_magic_tokens_on_user_id"
   end
