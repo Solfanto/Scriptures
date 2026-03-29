@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_151054) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -151,6 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
     t.integer "scripture_id", null: false
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
+    t.index ["scripture_id", "number"], name: "index_divisions_on_scripture_id_and_number"
     t.index ["scripture_id"], name: "index_divisions_on_scripture_id"
   end
 
@@ -189,6 +190,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
     t.string "role", default: "viewer", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_group_invitations_on_email"
     t.index ["group_id"], name: "index_group_invitations_on_group_id"
     t.index ["invited_by_id"], name: "index_group_invitations_on_invited_by_id"
     t.index ["token"], name: "index_group_invitations_on_token", unique: true
@@ -330,6 +332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
     t.integer "number"
     t.integer "position"
     t.datetime "updated_at", null: false
+    t.index ["division_id", "number"], name: "index_passages_on_division_id_and_number"
     t.index ["division_id"], name: "index_passages_on_division_id"
   end
 
@@ -398,6 +401,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
     t.text "description"
     t.string "name"
     t.datetime "updated_at", null: false
+    t.index ["abbreviation"], name: "index_source_documents_on_abbreviation"
     t.index ["corpus_id"], name: "index_source_documents_on_corpus_id"
   end
 
@@ -440,6 +444,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_140129) do
     t.string "language"
     t.string "name"
     t.datetime "updated_at", null: false
+    t.index ["abbreviation"], name: "index_translations_on_abbreviation"
     t.index ["corpus_id"], name: "index_translations_on_corpus_id"
   end
 

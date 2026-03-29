@@ -394,32 +394,35 @@
     <div class="flex-1 overflow-y-auto">
       <%# Tab 0: Source Criticism %>
       <div data-study-tabs-target="panel" class="p-5 space-y-4">
-        <% @passages.each do |passage| %>
-          <% sources = passage.source_documents %>
-          <% next if sources.empty? %>
-          <div>
-            <span class="text-[10px] font-bold text-stone-400"><%= passage.number %></span>
-            <% sources.each do |sd| %>
-              <div class="flex items-center gap-2 mt-1">
-                <div class="w-2.5 h-2.5 <%= source_bg_class(sd.color) %> rounded-sm shrink-0"></div>
-                <span class="text-xs font-medium"><%= sd.name %> (<%= sd.abbreviation %>)</span>
-              </div>
-              <% if sd.description.present? %>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5 ml-5"><%= sd.description.truncate(200) %></p>
+        <% cache ["study-sources", @division] do %>
+          <% @passages.each do |passage| %>
+            <% sources = passage.source_documents %>
+            <% next if sources.empty? %>
+            <div>
+              <span class="text-[10px] font-bold text-stone-400"><%= passage.number %></span>
+              <% sources.each do |sd| %>
+                <div class="flex items-center gap-2 mt-1">
+                  <div class="w-2.5 h-2.5 <%= source_bg_class(sd.color) %> rounded-sm shrink-0"></div>
+                  <span class="text-xs font-medium"><%= sd.name %> (<%= sd.abbreviation %>)</span>
+                </div>
+                <% if sd.description.present? %>
+                  <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5 ml-5"><%= sd.description.truncate(200) %></p>
+                <% end %>
+                <% if sd.bibliography_url.present? %>
+                  <p class="text-[10px] ml-5 mt-0.5"><%= link_to "Scholarly literature \u2192", sd.bibliography_url, target: "_blank", rel: "noopener", class: "text-blue-500 hover:underline" %></p>
+                <% end %>
               <% end %>
-              <% if sd.bibliography_url.present? %>
-                <p class="text-[10px] ml-5 mt-0.5"><%= link_to "Scholarly literature \u2192", sd.bibliography_url, target: "_blank", rel: "noopener", class: "text-blue-500 hover:underline" %></p>
-              <% end %>
-            <% end %>
-          </div>
-        <% end %>
-        <% if @source_documents.empty? %>
-          <p class="text-xs text-stone-400 italic">No source criticism data for this chapter.</p>
+            </div>
+          <% end %>
+          <% if @source_documents.empty? %>
+            <p class="text-xs text-stone-400 italic">No source criticism data for this chapter.</p>
+          <% end %>
         <% end %>
       </div>
 
       <%# Tab 1: Textual Variants %>
       <div data-study-tabs-target="panel" class="p-5 space-y-4" style="display: none;">
+        <% cache ["study-variants", @division] do %>
         <% @passages.each do |passage| %>
           <% variants = passage.textual_variants %>
           <% next if variants.empty? %>
@@ -442,10 +445,12 @@
         <% unless @passages.any? { |p| p.textual_variants.any? } %>
           <p class="text-xs text-stone-400 italic">No textual variants for this chapter.</p>
         <% end %>
+        <% end %>
       </div>
 
       <%# Tab 2: Parallel Passages %>
       <div data-study-tabs-target="panel" class="p-5 space-y-4" style="display: none;">
+        <% cache ["study-parallels", @division] do %>
         <% @passages.each do |passage| %>
           <% parallels = passage.parallel_passages %>
           <% next if parallels.empty? %>
@@ -472,10 +477,12 @@
         <% unless @passages.any? { |p| p.parallel_passages.any? } %>
           <p class="text-xs text-stone-400 italic">No parallel passages linked for this chapter.</p>
         <% end %>
+        <% end %>
       </div>
 
       <%# Tab 3: Commentary %>
       <div data-study-tabs-target="panel" class="p-5 space-y-4" style="display: none;">
+        <% cache ["study-commentary", @division] do %>
         <% @passages.each do |passage| %>
           <% comments = passage.commentaries %>
           <% next if comments.empty? %>
@@ -492,6 +499,7 @@
         <% end %>
         <% unless @passages.any? { |p| p.commentaries.any? } %>
           <p class="text-xs text-stone-400 italic">No commentary available for this chapter.</p>
+        <% end %>
         <% end %>
       </div>
     </div>

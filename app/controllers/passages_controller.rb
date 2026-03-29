@@ -48,6 +48,12 @@ class PassagesController < ApplicationController
       @diff_left = @selected_translations[0]
       @diff_right = @selected_translations[1]
     end
+
+    # HTTP caching for unauthenticated visitors
+    unless current_user
+      expires_in 1.hour, public: true
+      fresh_when etag: cache_key, last_modified: @division.updated_at
+    end
   end
 
   private
@@ -65,5 +71,9 @@ class PassagesController < ApplicationController
     primary = @translations.find_by(language: "Hebrew") || @translations.first
     secondary = @translations.find_by(abbreviation: "KJV") || @translations.second
     [ primary, secondary ].compact.uniq
+  end
+
+  def cache_key
+    [ @division.id, @division.updated_at, params[:t], params[:parallel], params[:diff] ]
   end
 end
