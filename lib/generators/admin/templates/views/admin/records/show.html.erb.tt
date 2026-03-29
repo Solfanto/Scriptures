@@ -1,0 +1,37 @@
+<%% content_for :title, "#{t('activerecord.models.' + record_class.model_name.i18n_key.to_s, default: record_class.to_s.titleize)} | #{t('admin.labels.admin', default: 'Admin')}" %>
+
+<div class="record-detail">
+  <%%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <div class="record-detail__header">
+    <div class="record-detail__header-content">
+      <%%= link_to t("admin.labels.back", default: "Back"), back_to_index_url, class: "record-detail__back-link" %>
+      <div class="record-detail__header-title-group">
+        <h1 class="record-detail__title"><%%= format_record_title(@record) %></h1>
+        <%% if history_available? && history_path(@record).present? %>
+          <%%= link_to t("admin.labels.view_history", default: "View History"), history_path(@record),
+              class: "record-detail__history-link",
+              data: { turbo_frame: "_top" } if authorized_for_read? %>
+        <%% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="record-detail__attributes">
+    <%% show_columns.each do |column| %>
+      <%% key = column.to_s %>
+      <%% value = @record.public_send(key) %>
+      <div class="record-detail__attribute">
+        <span class="record-detail__attribute-label">
+          <%%= column_titles[key] || t("activerecord.attributes.#{record_class.model_name.i18n_key}.#{key}", default: key.to_s.humanize) %>:
+        </span>
+        <span class="record-detail__attribute-value"><%%= format_value(@record, key) %></span>
+      </div>
+    <%% end %>
+  </div>
+
+  <div class="record-detail__actions">
+    <%%= render "actions" %>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<%# locals: (form:, field_name:, placeholder: "Search for a country...", value: form.object&.send(field_name) || [], css_class: "", required: false) %>
+<%
+  selected_countries = value || []
+  selected_countries = [] if selected_countries.blank?
+  selected_countries_data = selected_countries.map do |code|
+    country = ISO3166::Country[code]
+    {
+      code: code,
+      name: country&.translations&.[](I18n.locale.to_s) || country&.common_name || code
+    }
+  end
+%>
+
+<div class="<%= class_names("countries-select", css_class) %>"
+     data-controller="countries-select"
+     data-countries-select-placeholder-value="<%= placeholder %>"
+     data-countries-select-no-countries-label-value="<%= t('admin.labels.no_countries_found', default: 'No countries found') %>"
+     data-countries-select-field-name-value="<%= field_name %>"
+     data-countries-select-model-name-value="<%= form.object.model_name.param_key %>">
+
+  <div class="countries-select__input-wrapper">
+    <input type="text"
+           name=""
+           value=""
+           placeholder="<%= placeholder %>"
+           autocomplete="off"
+           class="countries-select__input record-edit__field-input"
+           data-countries-select-target="input"
+           data-action="input->countries-select#filter keydown->countries-select#keydown focus->countries-select#showDropdown" />
+
+    <div class="countries-select__toggle"
+         data-action="click->countries-select#toggleDropdown"
+         title="<%= t('admin.labels.open_country_list', default: 'Open country list') %>">
+      <!-- Arrow is now handled by CSS background-image -->
+    </div>
+  </div>
+
+  <div class="countries-select__dropdown" data-countries-select-target="dropdown">
+    <!-- Options will be populated by Stimulus controller -->
+  </div>
+
+  <div class="countries-select__selected" data-countries-select-target="selectedList">
+    <% selected_countries_data.each do |country_data| %>
+      <div class="countries-select__selected-item" data-code="<%= country_data[:code] %>">
+        <span class="countries-select__selected-name"><%= country_data[:name] %></span>
+        <button type="button" class="countries-select__selected-remove" data-action="click->countries-select#removeCountry" data-code="<%= country_data[:code] %>">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+        <%= form.hidden_field "#{form.object.model_name.param_key}[#{field_name}][]", value: country_data[:code], data: { countries_select_target: "hiddenField" } %>
+      </div>
+    <% end %>
+    <% if selected_countries_data.empty? %>
+      <div class="countries-select__selected-empty">
+        <%= t("admin.labels.no_countries_selected", default: "No countries selected") %>
+      </div>
+    <% end %>
+  </div>
+</div>

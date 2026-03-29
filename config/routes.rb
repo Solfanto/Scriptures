@@ -81,4 +81,9 @@ Rails.application.routes.draw do
 
   # Root: show the default reading view (Genesis 1)
   root "passages#show"
+
+  namespace :admin do
+    root "dashboard#index"
+    get "countries", to: "countries#index"
+  end
 end

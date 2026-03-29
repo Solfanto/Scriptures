@@ -1,0 +1,84 @@
+<%# locals: (form:, field_name:, css_class: "") %>
+<%
+  # Get the current JSONB data, defaulting to empty hash
+  json_data = form.object.send(field_name) || {}
+  json_data = {} if json_data.blank?
+%>
+
+<div class="<%= class_names("record-edit__field-jsonb", css_class) %>"
+     data-controller="jsonb-editor"
+     data-jsonb-editor-field-name-value="<%= field_name %>">
+
+  <!-- Hidden field that will contain the JSON string -->
+  <%= form.hidden_field field_name, data: {
+    jsonb_editor_target: "jsonInput",
+    initial_value: json_data.to_json
+  } %>
+
+  <div class="record-edit__field-jsonb-table-container">
+    <table class="record-edit__field-jsonb-table" data-jsonb-editor-target="table">
+      <thead>
+        <tr>
+          <th class="record-edit__field-jsonb-header-cell"><%= t("admin.labels.key", default: "Key") %></th>
+          <th class="record-edit__field-jsonb-header-cell"><%= t("admin.labels.value", default: "Value") %></th>
+          <th class="record-edit__field-jsonb-header-cell w-12"></th>
+        </tr>
+      </thead>
+      <tbody data-jsonb-editor-target="tbody">
+        <% if json_data.respond_to?(:any?) && json_data.any? %>
+          <% json_data.each do |key, value| %>
+            <tr class="record-edit__field-jsonb-row" data-jsonb-editor-target="row">
+              <td class="record-edit__field-jsonb-cell">
+                <input type="text"
+                       value="<%= key %>"
+                       class="record-edit__field-jsonb-input jsonb-key-input"
+                       data-action="input->jsonb-editor#onKeyInput">
+              </td>
+              <td class="record-edit__field-jsonb-cell">
+                <input type="text"
+                       value="<%= value %>"
+                       class="record-edit__field-jsonb-input jsonb-value-input"
+                       data-action="input->jsonb-editor#onValueInput">
+              </td>
+              <td class="record-edit__field-jsonb-cell">
+                <button type="button"
+                        class="record-edit__field-jsonb-remove-btn"
+                        data-action="click->jsonb-editor#removeRow">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+        <!-- Empty row for new entries -->
+        <tr class="record-edit__field-jsonb-row" data-jsonb-editor-target="row">
+          <td class="record-edit__field-jsonb-cell">
+            <input type="text"
+                   value=""
+                   class="record-edit__field-jsonb-input jsonb-key-input"
+                   placeholder="<%= t('admin.labels.enter_key', default: 'Enter key...') %>"
+                   data-action="input->jsonb-editor#onKeyInput">
+          </td>
+          <td class="record-edit__field-jsonb-cell">
+            <input type="text"
+                   value=""
+                   class="record-edit__field-jsonb-input jsonb-value-input"
+                   placeholder="<%= t('admin.labels.enter_value', default: 'Enter value...') %>"
+                   data-action="input->jsonb-editor#onValueInput">
+          </td>
+          <td class="record-edit__field-jsonb-cell">
+            <button type="button"
+                    class="record-edit__field-jsonb-remove-btn"
+                    data-action="click->jsonb-editor#removeRow">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -8,12 +8,12 @@ class MagicTokenTest < ActiveSupport::TestCase
     assert_equal 6, token.short_code.length
     assert_equal "bt_123", token.browser_token
     assert token.expires_at > Time.current
-    assert_equal "new@example.com", token.user.email_address
+    assert_equal "new@example.com", token.user.email
   end
 
   test "generate_for reuses existing user" do
     existing = users(:scholar)
-    token = MagicToken.generate_for(existing.email_address, browser_token: "bt")
+    token = MagicToken.generate_for(existing.email, browser_token: "bt")
     assert_equal existing, token.user
   end
 

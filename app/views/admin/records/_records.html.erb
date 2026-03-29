@@ -1,0 +1,191 @@
+<%# locals: (id: nil, record_class:, records:, record_path:, index_columns:, column_widths:, column_titles:, filterable_columns:, filter_enabled:, authorized_for_create:, pagy:, available_page_sizes:, sort_params_key: :sort, sort_params:, limit_param_name:, link_column_key:, export_csv_index: false, show_actions: true, authorized_for_import: nil) %>
+
+<%= turbo_frame_tag id.presence || record_class.model_name.i18n_key.to_s.pluralize, data: {
+  turbo_action: "advance",
+  controller: "records",
+  records_resource_name_value: record_class.to_s.underscore.pluralize,
+  records_discardable_value: record_class.column_names.include?('discarded_at'),
+  records_confirm_discard_label_value: t("admin.messages.confirm_bulk_discard", count: 0, default: "Are you sure you want to discard %{count} item?"),
+  records_confirm_delete_label_value: t("admin.messages.confirm_bulk_delete", count: 0, default: "Are you sure you want to permanently delete %{count} item? This action cannot be undone."),
+  records_confirm_restore_label_value: t("admin.messages.confirm_bulk_restore", count: 0, default: "Are you sure you want to restore %{count} item?"),
+  records_error_label_value: t("admin.messages.bulk_action_error", default: "An error occurred while performing the bulk action.")
+} do %>
+  <div class="records">
+    <!-- Header Section -->
+    <div class="records__header">
+      <div class="records__header-content">
+        <h2 class="records__title">
+          <%= t("activerecord.models.#{record_class.model_name.i18n_key.to_s.pluralize}", default: record_class.to_s.titleize.pluralize) %>
+          (<%= pagy.count %>)
+        </h2>
+        <div class="records__header-actions">
+          <div class="records__columns-toggle" data-records-target="columnsToggle">
+            <button type="button" class="records__columns-toggle-btn" data-action="click->records#toggleColumnsMenu">
+              <svg class="records__columns-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4h6m-6 4h6m-6 4h6m-6 4h6M4 4h.01M4 8h.01M4 12h.01M4 16h.01"/>
+              </svg>
+              <%= t("admin.labels.columns", default: "Columns") %>
+            </button>
+            <div class="records__columns-menu" data-records-target="columnsMenu" style="display: none;">
+              <% index_columns.each do |column| %>
+                <% key = column.to_s %>
+                <label class="records__columns-menu-item">
+                  <input type="checkbox" checked data-action="change->records#toggleColumn" data-column-key="<%= key %>">
+                  <span><%= column_titles[key] || t("activerecord.attributes.#{record_class.to_s.underscore}.#{key}", default: key.to_s.humanize) %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+          <%= render partial: "admin/records/pagination_header", locals: {
+            available_page_sizes: available_page_sizes,
+            limit_param_name: limit_param_name,
+            exclude_params: [:limit]
+          } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="records__table-container">
+      <table class="records__table">
+        <thead class="records__table-head">
+          <tr class="records__header-row">
+            <th class="records__header-cell records__header-cell--selection"></th>
+            <% index_columns.each do |column| %>
+              <% key = column.to_s %>
+              <th class="records__header-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+                <%= sortable_header_link(
+                  sort_params_key.present? ? url_for(params.permit(:controller, :action, :page, :limit, filter: filterable_columns).merge(sort_params_key => toggle_sort(key, to_string: true))) : nil,
+                  sort_params_key: sort_params_key
+                ) do %>
+                  <div class="records__header-content">
+                    <span class="records__column-name" title="<%= t("activerecord.attributes.#{record_class.to_s.underscore}.#{key}", default: key.to_s.humanize) %>">
+                      <% if key == 'position' && positionable? %>
+                        #
+                      <% else %>
+                        <%= column_titles[key] || t("activerecord.attributes.#{record_class.to_s.underscore}.#{key}", default: key.to_s.humanize) %>
+                      <% end %>
+                    </span>
+                    <% if sort_params_key.present? %>
+                      <div class="records__sort-icons">
+                        <% if sort_params[key] == :asc %>
+                          <svg class="records__sort-icon records__sort-icon--active" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                          </svg>
+                          <% if sort_params.count > 1 %>
+                            <span class="records__sort-index"><%= sort_params_index(key) + 1 %></span>
+                          <% end %>
+                        <% elsif sort_params[key] == :desc %>
+                          <svg class="records__sort-icon records__sort-icon--active records__sort-icon--desc" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                          </svg>
+                          <% if sort_params.count > 1 %>
+                            <span class="records__sort-index"><%= sort_params_index(key) + 1 %></span>
+                          <% end %>
+                        <% else %>
+                          <svg class="records__sort-icon records__sort-icon--inactive" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                          </svg>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </th>
+            <% end %>
+            <% if show_actions %>
+              <th class="records__header-cell records__header-cell--actions">
+                <span class="records__column-name"><%= t("admin.labels.actions", default: "Actions") %></span>
+              </th>
+            <% end %>
+          </tr>
+          <% if filter_enabled %>
+            <tr class="records__filter-row" id="<%= ["admin", record_class.to_s.underscore, "tr", "filters"].join("-") %>" data-turbo-permanent>
+              <td class="records__filter-cell records__filter-cell--selection">
+                <input type="checkbox" class="records__select-all" data-action="change->records#toggleSelectAll">
+              </td>
+              <% index_columns.each do |column| %>
+                <% key = column.to_s %>
+                <td class="records__filter-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+                  <% if filterable_columns.include?(key) %>
+                    <%= form_with url: url_for(params.permit(:controller, :action, :page, :limit, :sort)), method: :get, class: "records__filter-form" do |f| %>
+                      <div class="records__filter-input-wrapper">
+                        <%= f.search_field "filter[#{key}]",
+                          value: params.dig(:filter, key),
+                          autocomplete: "off",
+                          tabindex: "-1",
+                          class: "records__filter-input",
+                          placeholder: t("admin.labels.filter_placeholder", field_name: column_titles[key] || t("activerecord.attributes.#{record_class.model_name.i18n_key}.#{key}", default: key.to_s.humanize), default: "🔍 Filter %{field_name}..."),
+                          data: {
+                            action: "input->records#filter",
+                            records_target: "filterInput",
+                          }
+                        %>
+                      </div>
+                    <% end %>
+                  <% end %>
+                </td>
+              <% end %>
+              <% if show_actions %>
+                <td class="records__filter-cell records__filter-cell--actions">
+                  <div class="records__bulk-actions" data-records-target="bulkActions" style="display: none;">
+                    <div class="records__bulk-actions-buttons">
+                      <% if authorized_for_discard? %>
+                        <button type="button" class="records__action-link records__action-link--discard records__bulk-discard" data-action="click->records#bulkDiscard" style="display: none;">
+                          <%= t("admin.labels.discard_selected", default: "Discard selected") %> (<span data-records-target="discardCount">0</span>)
+                        </button>
+                        <button type="button" class="records__action-link records__action-link--restore records__bulk-restore" data-action="click->records#bulkRestore" style="display: none;">
+                          <%= t("admin.labels.restore_selected", default: "Restore selected") %> (<span data-records-target="restoreCount">0</span>)
+                        </button>
+                      <% end %>
+                      <% if authorized_for_destroy? %>
+                        <button type="button" class="records__action-link records__action-link--delete records__bulk-delete" data-action="click->records#bulkDelete" style="display: none;">
+                          <%= t("admin.labels.delete_selected", default: "Delete selected") %> (<span data-records-target="deleteCount">0</span>)
+                        </button>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </thead>
+        <tbody class="records__table-body" <% if positionable? %>data-controller="positions" data-positions-container<% end %>>
+          <% if records.any? %>
+            <%= render partial: "admin/records/row", collection: records, as: :record, locals: {
+              record_class:, record_path:, index_columns:, column_widths:, link_column_key:, show_actions:
+            } %>
+          <% else %>
+            <tr class="records__empty-row" id="<%= ["row", record_class.to_s.underscore, "empty"].join("-") %>">
+              <td colspan="<%= index_columns.count + (show_actions ? 1 : 0) %>" class="records__empty-cell">
+                <div class="records__empty-state">
+                  <svg class="records__empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                  </svg>
+                  <% record_name = t("activerecord.models.#{record_class.model_name.i18n_key.to_s.pluralize}", default: record_class.to_s.titleize.pluralize.downcase) %>
+                  <h3 class="records__empty-title"><%= t("admin.labels.no_records_found", record_name: record_name, default: "No %{record_name} found") %></h3>
+                  <p class="records__empty-description"><%= t("admin.labels.try_adjusting_filters", default: "Try adjusting your filters or search terms.") %></p>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer Section -->
+    <% record_name = t("activerecord.models.#{record_class.model_name.i18n_key.to_s.pluralize}", default: record_class.to_s.titleize.pluralize.downcase) %>
+    <%= render partial: "admin/records/pagination_footer", locals: {
+      pagy: pagy,
+      record_name: record_name
+    } %>
+
+    <% if show_actions %>
+      <%= render partial: "records_actions", locals: {
+        record_class:,
+          authorized_for_create:,
+          export_csv_index:
+        } %>
+    <% end %>
+  </div>
+<% end %>

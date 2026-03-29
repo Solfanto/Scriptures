@@ -1,0 +1,6 @@
+<%%# locals: (record_class:, authorized_for_create:, export_csv_index:) %>
+
+<div class="records__actions">
+  <%%= link_to t("admin.labels.new_record", default: "New %{record_name}", record_name: t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize)), url_for(controller: params[:controller], action: :new), class: "action-btn action-btn--primary records__new-button", data: { turbo_frame: "_top" } if authorized_for_create %>
+  <%%= link_to t("admin.labels.export_csv", default: "Export CSV"), url_for(params.permit(:controller, :action, :page, :limit, :sort, filter: filterable_columns).merge(format: :csv)), class: "action-btn action-btn--secondary records__export-csv-button" if export_csv_index %>
+</div>

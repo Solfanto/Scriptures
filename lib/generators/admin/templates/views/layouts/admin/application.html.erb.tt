@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%%= content_for(:title) || "Admin" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#F9FAFC">
+    <meta name="msapplication-navbutton-color" content="#F9FAFC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#F9FAFC">
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="robots" content="noindex, nofollow">
+    <%%= csrf_meta_tags %>
+    <%%= csp_meta_tag %>
+
+    <%%= render "admin/application/scripts" %>
+
+    <%%= yield :head %>
+
+    <%%= stylesheet_link_tag "admin/application", "data-turbo-track": "reload" %>
+    <%%= javascript_include_tag "admin/application", "data-turbo-track": "reload", type: "module" %>
+    <%%= yield :javascript %>
+  </head>
+
+  <body>
+    <%% if Rails.env.production? %>
+      <div class="production-banner"></div>
+    <%% end %>
+    <%%= render "admin/application/sidebar" %>
+
+    <div class="main-content">
+      <div class="content-wrapper">
+        <%%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

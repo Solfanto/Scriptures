@@ -1,0 +1,111 @@
+<%# locals: (record_class:, record:, record_path:, index_columns:, column_widths: {}, link_column_key:, show_actions: true) %>
+<%
+  # Check if this record is discarded
+  is_discarded = record.respond_to?(:discarded?) && record.discarded?
+
+  # Check if record is positionable
+  is_positionable = record.respond_to?(:positionable?) && record.positionable? && record.class.column_names.include?('position')
+%>
+<tr class="<%= class_names("records__data-row", "records__data-row--discarded" => is_discarded) %>"
+    id="<%= ["row", record.class.to_s.underscore, record.id].join("-") %>"
+    data-record-id="<%= record.id %>"
+    <% if is_positionable %>
+      data-positions-draggable="true"
+    <% end %>
+>
+  <td class="records__data-cell records__data-cell--selection">
+    <input type="checkbox" class="records__row-select" data-record-id="<%= record.id %>" data-action="change->records#updateSelection">
+  </td>
+  <% index_columns.each do |key| %>
+    <% value = record.public_send(key.to_sym) %>
+    <% if key.to_s == link_column_key.to_s %>
+      <td class="records__data-cell records__data-cell--primary" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+        <% if record_path.present? %>
+          <%= link_to format_value(record, key, format: :short).to_s, record_path.(id: record.id), class: "records__primary-link", data: { turbo_frame: "_top" } %>
+        <% else %>
+          <span class="records__cell-content"><%= format_value(record, key, format: :short) %></span>
+        <% end %>
+      </td>
+    <% elsif value.is_a?(ActiveRecord::Associations::CollectionProxy) %>
+      <td class="records__data-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+        <span class="records__cell-content"><%= format_association_tags(value) %></span>
+      </td>
+    <% elsif !record.attributes.include?(key.to_s) && !record.respond_to?(key.to_sym) %>
+      <td class="records__data-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+      </td>
+    <% elsif key == 'position' && is_positionable %>
+      <td class="records__data-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+        <div class="records__drag-handle" data-positions-drag-handle style="display: inline-block; cursor: move; margin-left: 6px; user-select: none;">
+          <svg class="records__drag-handle-icon" fill="currentColor" viewBox="0 0 20 20" style="width: 14px; height: 14px; opacity: 0.4; display: inline-block; vertical-align: middle; pointer-events: none;">
+            <path d="M7 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 2zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 7 14zm6-8a2 2 0 1 1 .001-4.001A2 2 0 0 1 13 6zm0 2a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 8zm0 6a2 2 0 1 1 .001 4.001A2 2 0 0 1 13 14z"/>
+          </svg>
+        </div>
+      </td>
+    <% else %>
+      <td class="records__data-cell" data-column-key="<%= key %>" style="max-width: <%= column_widths[key] || 'auto' %>">
+        <span class="records__cell-content" title="<%= value.respond_to?(:association_name) ? value.association_name : value %>"><%= format_value(record, key, format: :short) %></span>
+      </td>
+    <% end %>
+  <% end %>
+  <% if show_actions %>
+    <td class="records__data-cell records__data-cell--actions">
+      <div class="records__cell-actions">
+        <% if record.class.column_names.include?('discarded_at') %>
+          <% if is_discarded %>
+            <% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+            <%= button_to t("admin.labels.restore", default: "Restore"), url_for(controller: params[:controller], action: :restore, id: record.id),
+                method: :post,
+                class: "records__action-link records__action-link--restore",
+                confirm: t("admin.labels.restore_confirm", record_name: record_name, default: "Are you sure you want to restore this %{record_name}?"),
+                form: {
+                  class: "records__restore-form",
+                  data: {
+                    turbo_frame: "_top",
+                    turbo_confirm: t("admin.labels.restore_confirm", record_name: record_name, default: "Are you sure you want to restore this %{record_name}?")
+                  }
+                } if authorized_for_discard? %>
+            <%= button_to t("admin.labels.delete", default: "Delete"), url_for(controller: params[:controller], action: :destroy, id: record.id),
+                method: :delete,
+                class: "records__action-link records__action-link--delete",
+                confirm: t("admin.labels.delete_permanent_confirm", record_name: record_name, default: "Are you sure you want to permanently delete this %{record_name}?"),
+                form: {
+                  class: "records__delete-form",
+                  data: {
+                    turbo_frame: "_top",
+                    turbo_confirm: t("admin.labels.delete_permanent_confirm", record_name: record_name, default: "Are you sure you want to permanently delete this %{record_name}?")
+                  }
+                } if authorized_for_destroy? %>
+          <% else %>
+            <%= link_to t("admin.labels.edit", default: "Edit"), url_for(controller: params[:controller], action: :edit, id: record.id), class: "records__action-link records__action-link--edit", data: { turbo_frame: "_top" } if authorized_for_update? %>
+            <% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+            <%= button_to t("admin.labels.discard", default: "Discard"), url_for(controller: params[:controller], action: :discard, id: record.id),
+              method: :post,
+              class: "records__action-link records__action-link--discard",
+              confirm: t("admin.labels.discard_confirm", record_name: record_name, default: "Are you sure you want to discard this %{record_name}?"),
+              form: {
+                class: "records__delete-form",
+                data: {
+                  turbo_frame: "_top",
+                  turbo_confirm: t("admin.labels.discard_confirm", record_name: record_name, default: "Are you sure you want to discard this %{record_name}?")
+                }
+              } if authorized_for_discard? %>
+          <% end %>
+        <% else %>
+          <%= link_to t("admin.labels.edit", default: "Edit"), url_for(controller: params[:controller], action: :edit, id: record.id), class: "records__action-link records__action-link--edit", data: { turbo_frame: "_top" } if authorized_for_update? %>
+          <% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+          <%= button_to t("admin.labels.delete", default: "Delete"), url_for(controller: params[:controller], action: :destroy, id: record.id),
+              method: :delete,
+              class: "records__action-link records__action-link--delete",
+              confirm: t("admin.labels.delete_confirm", record_name: record_name, default: "Are you sure you want to delete this %{record_name}?"),
+              form: {
+                class: "records__delete-form",
+                data: {
+                  turbo_frame: "_top",
+                  turbo_confirm: t("admin.labels.delete_confirm", record_name: record_name, default: "Are you sure you want to delete this %{record_name}?")
+                }
+              } if authorized_for_destroy? %>
+        <% end %>
+      </div>
+    </td>
+  <% end %>
+</tr>

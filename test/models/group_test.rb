@@ -18,7 +18,7 @@ class GroupTest < ActiveSupport::TestCase
 
   test "role_for returns membership role" do
     group = Group.create!(name: "Test", owner: users(:scholar))
-    other = User.create!(email_address: "other@example.com")
+    other = User.create!(email: "other@example.com")
     group.group_memberships.create!(user: other, role: "editor")
     assert_equal "editor", group.role_for(other)
   end

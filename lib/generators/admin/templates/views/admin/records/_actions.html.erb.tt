@@ -1,0 +1,46 @@
+<%% if @record.class.column_names.include?('discarded_at') %>
+  <%% if @record.respond_to?(:discarded?) && @record.discarded? %>
+    <%% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+    <%%= button_to t("admin.labels.restore", default: "Restore"), url_for(controller: params[:controller], action: :restore, id: @record.id),
+        method: :post,
+        class: "action-btn action-btn--success record-detail__restore-button",
+        confirm: t("admin.labels.restore_confirm", record_name: record_name, default: "Are you sure you want to restore this %{record_name}?"),
+        form: {
+          class: "record-detail__restore-form",
+          data: { turbo_confirm: t("admin.labels.restore_confirm", record_name: record_name, default: "Are you sure you want to restore this %{record_name}?") }
+        } if authorized_for_discard? %>
+    <%%= button_to t("admin.labels.delete", default: "Delete"), url_for(controller: params[:controller], action: :destroy, id: @record.id),
+        method: :delete,
+        class: "action-btn action-btn--danger record-detail__delete-button",
+        confirm: t("admin.labels.delete_permanent_confirm", record_name: record_name, default: "Are you sure you want to permanently delete this %{record_name}? This action cannot be undone."),
+        form: {
+          class: "record-detail__delete-form",
+          data: { turbo_confirm: t("admin.labels.delete_permanent_confirm", record_name: record_name, default: "Are you sure you want to permanently delete this %{record_name}? This action cannot be undone.") }
+        } if authorized_for_destroy? %>
+    <%%= link_to t("admin.labels.export_csv", default: "Export CSV"), url_for(controller: params[:controller], action: :show, id: @record.id, format: :csv), class: "action-btn action-btn--secondary record-detail__export-csv-link" if export_csv_show? %>
+  <%% else %>
+    <%%= link_to t("admin.labels.edit", default: "Edit"), url_for(controller: params[:controller], action: :edit, id: @record.id), class: "action-btn action-btn--primary record-detail__edit-link" if authorized_for_update? %>
+    <%% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+    <%%= button_to t("admin.labels.discard", default: "Discard"), url_for(controller: params[:controller], action: :discard, id: @record.id),
+        method: :post,
+        class: "action-btn action-btn--warning record-detail__discard-button",
+        confirm: t("admin.labels.discard_confirm", record_name: record_name, default: "Are you sure you want to discard this %{record_name}?"),
+        form: {
+          class: "record-detail__discard-form",
+          data: { turbo_confirm: t("admin.labels.discard_confirm", record_name: record_name, default: "Are you sure you want to discard this %{record_name}?") }
+        } if authorized_for_discard? %>
+    <%%= link_to t("admin.labels.export_csv", default: "Export CSV"), url_for(controller: params[:controller], action: :show, id: @record.id, format: :csv), class: "action-btn action-btn--secondary record-detail__export-csv-link" if export_csv_show? %>
+  <%% end %>
+<%% else %>
+  <%%= link_to t("admin.labels.edit", default: "Edit"), url_for(controller: params[:controller], action: :edit, id: @record.id), class: "action-btn action-btn--primary record-detail__edit-link" if authorized_for_update? %>
+  <%% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize.downcase) %>
+  <%%= button_to t("admin.labels.delete", default: "Delete"), url_for(controller: params[:controller], action: :destroy, id: @record.id),
+      method: :delete,
+      class: "action-btn action-btn--danger record-detail__delete-button",
+      confirm: t("admin.labels.delete_confirm", record_name: record_name, default: "Are you sure you want to delete this %{record_name}? This action cannot be undone."),
+      form: {
+        class: "record-detail__delete-form",
+        data: { turbo_confirm: t("admin.labels.delete_confirm", record_name: record_name, default: "Are you sure you want to delete this %{record_name}? This action cannot be undone.") }
+      } if authorized_for_destroy? %>
+  <%%= link_to t("admin.labels.export_csv", default: "Export CSV"), url_for(controller: params[:controller], action: :show, id: @record.id, format: :csv), class: "action-btn action-btn--secondary record-detail__export-csv-link" if export_csv_show? %>
+<%% end %>

@@ -9,7 +9,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "create sends magic link email and redirects to verify" do
     assert_enqueued_emails 1 do
-      post session_path, params: { email_address: "scholar@example.com" }
+      post session_path, params: { email: "scholar@example.com" }
     end
     assert_redirected_to session_verification_path
     assert cookies[:browser_token].present?
@@ -17,7 +17,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "create auto-creates user for new email" do
     assert_difference "User.count", 1 do
-      post session_path, params: { email_address: "brand-new@example.com" }
+      post session_path, params: { email: "brand-new@example.com" }
     end
   end
 

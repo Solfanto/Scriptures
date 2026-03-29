@@ -1,0 +1,21 @@
+<%%# locals: (alert:) %>
+
+<%% if alert %>
+  <div class="flash-message flash-message--alert" data-controller="flash-message" id="flash-message-alert">
+    <div class="flash-message__content">
+      <div class="flash-message__icon-text">
+        <svg class="flash-message__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="flash-message__text"><%%= alert %></p>
+      </div>
+      <button type="button" class="flash-message__close" data-action="click->flash-message#dismiss" aria-label="<%%= t('admin.labels.close_notification', default: 'Close notification') %>">
+        <svg class="flash-message__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+<%% else %>
+  <%%= content_tag(:div, nil, id: "flash-message-alert", class: "hidden") %>
+<%% end %>

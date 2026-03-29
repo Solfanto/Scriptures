@@ -1,0 +1,22 @@
+<%% content_for :title, "#{t('admin.labels.edit_record', record_name: t('activerecord.models.' + record_class.model_name.i18n_key.to_s, default: record_class.to_s.titleize), default: 'Edit %{record_name}')} | #{t('admin.labels.admin', default: 'Admin')}" %>
+
+<div class="record-edit">
+  <%%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <div class="record-edit__header">
+    <%%= link_to t("admin.labels.back", default: "Back"), record_path(id: @record.id), class: "record-edit__back-link" %>
+  </div>
+
+  <div class="record-edit__form-container">
+    <div class="record-edit__form-header">
+      <%% record_name = t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize) %>
+      <h1 class="record-edit__title"><%%= t("admin.labels.edit_record", record_name: record_name, default: "Edit %{record_name}") %></h1>
+      <p class="record-edit__subtitle"><%%= t("admin.labels.update_information", default: "Update the information below to modify this record.") %></p>
+    </div>
+
+    <%%= render partial: "form", locals: {
+      create_button_text: t("admin.labels.create", record_name: t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.humanize), default: "Create %{record_name}"),
+      update_button_text: t("admin.labels.update", record_name: t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.humanize), default: "Update %{record_name}") } %>
+  </div>
+</div>

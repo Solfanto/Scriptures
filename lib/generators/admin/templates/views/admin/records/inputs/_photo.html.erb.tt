@@ -1,0 +1,89 @@
+<%%# locals: (form:, field_name:, css_class: "", required: false) %>
+
+<%%
+  record = form.object
+  attachment = record.public_send(field_name) if record.respond_to?(field_name)
+  has_existing_photo = attachment.respond_to?(:attached?) && attachment.attached? && attachment.blob&.persisted?
+  remove_field_name = "remove_#{field_name}"
+%>
+
+<div data-controller="photo-capture" data-photo-capture-field-name-value="<%%= field_name %>">
+  <%%= form.hidden_field remove_field_name, value: "0", data: { photo_capture_target: "removeInput" } %>
+
+  <div class="record-edit__photo-frame">
+    <!-- File Input (shown when no photo) -->
+    <div data-photo-capture-target="fileInputContainer" class="record-edit__photo-file-input" <%%= 'style="display: none;"'.html_safe if has_existing_photo %>>
+      <%%= form.file_field field_name,
+          class: class_names("record-edit__field-input form-input", css_class),
+          required: required,
+          accept: "image/*",
+          data: {
+            photo_capture_target: "fileInput",
+            action: "change->photo-capture#handleFileChange"
+          } %>
+      <button type="button"
+              class="btn btn--secondary record-edit__photo-open-camera"
+              data-photo-capture-target="openCameraButton"
+              data-action="click->photo-capture#openCamera">
+        <%%= t("admin.labels.open_camera", default: "Open Camera") %>
+      </button>
+    </div>
+
+    <!-- Camera (shown when camera is open) -->
+    <div data-photo-capture-target="cameraPreview" class="record-edit__photo-camera" style="display: none;">
+      <video data-photo-capture-target="video"
+             autoplay
+             playsinline
+             webkit-playsinline
+             muted
+             class="record-edit__photo-video"></video>
+      <canvas data-photo-capture-target="canvas" style="display: none;"></canvas>
+      <div class="record-edit__photo-actions">
+        <button type="button"
+                class="btn btn--secondary record-edit__photo-switch-camera"
+                data-photo-capture-target="switchCameraButton"
+                data-action="click->photo-capture#switchCamera"
+                aria-label="<%%= t('admin.labels.switch_camera', default: 'Switch Camera') %>">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </button>
+        <button type="button"
+                class="btn btn--primary record-edit__photo-take-button"
+                data-photo-capture-target="takeButton"
+                data-action="click->photo-capture#takePhoto"
+                aria-label="<%%= t('admin.labels.take_photo', default: 'Take') %>">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button type="button"
+                class="btn btn--secondary"
+                data-photo-capture-target="cancelButton"
+                data-action="click->photo-capture#cancelCamera">
+          <%%= t("admin.labels.cancel", default: "Cancel") %>
+        </button>
+      </div>
+    </div>
+
+    <!-- Photo Display (shown when photo exists or is just taken) -->
+    <div data-photo-capture-target="photoDisplay" class="record-edit__photo-display" <%%= 'style="display: none;"'.html_safe unless has_existing_photo %>>
+      <div class="record-edit__photo-display-wrapper">
+        <%% if has_existing_photo %>
+          <%%= image_tag attachment, alt: "Current photo", class: "record-edit__photo-display-img", data: { photo_capture_target: "existingPhotoImage" } %>
+        <%% end %>
+        <img data-photo-capture-target="previewImage" alt="Preview" class="record-edit__photo-display-img" style="<%%= 'display: none;' if has_existing_photo %>">
+        <button type="button"
+                class="record-edit__photo-delete-button"
+                data-photo-capture-target="deleteButton"
+                data-action="click->photo-capture#deletePhoto"
+                aria-label="<%%= t('admin.labels.delete_image', default: 'Delete image') %>">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

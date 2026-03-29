@@ -32,6 +32,10 @@ gem "prawn"
 gem "prawn-table"
 # CSV generation (no longer in Ruby stdlib since 3.4)
 gem "csv"
+# Fast, compact pagination [https://github.com/ddnexus/pagy]
+gem "pagy"
+# Audit trail for model changes [https://github.com/paper-trail-gem/paper_trail]
+gem "paper_trail"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

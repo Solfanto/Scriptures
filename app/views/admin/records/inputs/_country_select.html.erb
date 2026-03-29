@@ -1,0 +1,45 @@
+<%# locals: (form:, field_name:, placeholder: "Search for a country...", value: form.object&.send(field_name), value_name: ISO3166::Country[value || form.object&.send(field_name)]&.translations&.[](I18n.locale.to_s), css_class: "", required: false) %>
+
+<div class="<%= class_names("country-select", css_class) %>"
+     data-controller="country-select"
+     data-country-select-placeholder-value="<%= placeholder %>"
+     data-country-select-selected-value="<%= value %>"
+     data-country-select-selected-name-value="<%= value_name %>"
+     data-country-select-no-countries-label-value="<%= t('admin.labels.no_countries_found', default: 'No countries found') %>">
+
+    <div class="country-select__input-wrapper">
+      <input type="text"
+             name=""
+             value=""
+             placeholder="<%= placeholder %>"
+             autocomplete="off"
+             class="country-select__input record-edit__field-input"
+             data-country-select-target="input"
+             data-action="input->country-select#filter keydown->country-select#keydown focus->country-select#showDropdown"
+             <%= "required" if required %> />
+
+      <div class="country-select__clear"
+           data-country-select-target="clear"
+           data-action="click->country-select#clearSelection"
+           title="<%= t('admin.labels.clear_selection', default: 'Clear selection') %>">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </div>
+
+      <div class="country-select__toggle"
+           data-action="click->country-select#toggleDropdown"
+           title="<%= t('admin.labels.open_country_list', default: 'Open country list') %>">
+        <!-- Arrow is now handled by CSS background-image -->
+      </div>
+    </div>
+
+    <div class="country-select__dropdown" data-country-select-target="dropdown">
+      <!-- Options will be populated by Stimulus controller -->
+    </div>
+
+  <%= form.hidden_field field_name,
+      value:,
+      class: "country-select__hidden-field",
+      data: { country_select_target: "hiddenField" } %>
+</div>

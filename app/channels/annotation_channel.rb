@@ -14,7 +14,7 @@ class AnnotationChannel < ApplicationCable::Channel
       id: annotation.id,
       passage_id: annotation.passage_id,
       body: annotation.body,
-      user: annotation.user.display_name || annotation.user.email_address,
+      user: annotation.user.display_name || annotation.user.email,
       created_at: annotation.created_at.iso8601
     })
   end
@@ -26,7 +26,7 @@ class AnnotationChannel < ApplicationCable::Channel
       type: "comment",
       annotation_id: annotation.id,
       body: comment.body,
-      user: comment.user.display_name || comment.user.email_address,
+      user: comment.user.display_name || comment.user.email,
       created_at: comment.created_at.iso8601
     })
   end

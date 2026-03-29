@@ -1,0 +1,133 @@
+<% content_for :title, "#{t('admin.labels.history', default: 'History')} | #{format_record_title(@record)} | #{t('admin.labels.admin', default: 'Admin')}" %>
+
+<div class="record-detail">
+  <%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <div class="record-detail__header">
+    <div class="record-detail__header-content">
+      <%= link_to t("admin.labels.back", default: "Back"), record_path(id: @record.id), class: "record-detail__back-link" %>
+      <h1 class="record-detail__title">
+        <%= t('admin.labels.history', default: 'History') %>: <%= format_record_title(@record) %>
+      </h1>
+      <%= render partial: "admin/records/pagination_header", locals: {
+        available_page_sizes: available_page_sizes,
+        limit_param_name: :limit,
+        exclude_params: [:limit, :page]
+      } %>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "history_versions", data: { turbo_action: "advance" } do %>
+    <% if @versions.any? %>
+    <div class="record-detail__history">
+      <div class="record-detail__history-versions">
+        <% @versions.each_with_index do |version, index| %>
+          <div class="record-detail__history-version">
+            <div class="record-detail__history-version-header">
+              <div class="record-detail__history-version-meta">
+                <span class="record-detail__history-version-number">
+                  <%= t('admin.labels.version', number: @pagy.from + version.index, default: 'Version %{number}') %>
+                </span>
+                <span class="record-detail__history-version-date">
+                  <%= version.created_at.to_formatted_s(:default) %>
+                </span>
+                <% if version.whodunnit.present? %>
+                  <span class="record-detail__history-version-author">
+                    <% user = User.find_by(id: version.whodunnit) %>
+                    <%= user ? user.email : version.whodunnit %>
+                  </span>
+                <% end %>
+              </div>
+              <% if version.id != latest_version_id && restore_history_version_path(@record, version_id: version.id).present? %>
+                <%= button_to t("admin.labels.restore_version", default: "Restore"),
+                    restore_history_version_path(@record, version_id: version.id),
+                    method: :patch,
+                    class: "records__action-link records__action-link--restore",
+                    form: {
+                      class: "records__restore-form",
+                      data: {
+                        turbo_confirm: t("admin.labels.restore_version_confirm", default: "Are you sure you want to restore this version? This will overwrite the current record data.")
+                      }
+                    } if authorized_for_update? %>
+              <% end %>
+            </div>
+
+            <div class="record-detail__history-version-content">
+              <% if version.event == 'create' %>
+                <div class="record-detail__history-event-badge record-detail__history-event-badge--created">
+                  <%= t('admin.labels.created', default: 'Created') %>
+                </div>
+
+                <% if version.object.present? %>
+                  <% version.object.except('id', 'created_at', 'updated_at').each do |key, value| %>
+                    <% next if value.nil? %>
+                    <% next if value.blank? && value != false %>
+                    <div class="record-detail__history-change">
+                      <span class="record-detail__history-change-label">
+                        <%= t("activerecord.attributes.#{@record.class.model_name.i18n_key}.#{key}", default: key.to_s.humanize) %>:
+                      </span>
+                      <span class="record-detail__history-change-value">
+                        <%= obfuscate_sensitive_data(@record, key, value) %>
+                      </span>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% elsif version.event == 'update' %>
+                <div class="record-detail__history-event-badge record-detail__history-event-badge--updated">
+                  <%= t('admin.labels.updated', default: 'Updated') %>
+                </div>
+
+                <% if version.object_changes.present? %>
+                  <% version.object_changes.each do |key, change_values| %>
+                    <% next if key == 'updated_at' || key == 'created_at' %>
+                    <%
+                      old_value, new_value = if change_values.is_a?(Array) && change_values.length == 2
+                        change_values
+                      else
+                        [nil, change_values]
+                      end
+                    %>
+                    <div class="record-detail__history-change">
+                      <span class="record-detail__history-change-label">
+                        <%= t("activerecord.attributes.#{@record.class.model_name.i18n_key}.#{key}", default: key.to_s.humanize) %>:
+                      </span>
+                      <span class="record-detail__history-change-value">
+                        <span class="record-detail__history-change-old">
+                          <%= obfuscate_sensitive_data(@record, key, old_value) || t('admin.labels.empty', default: '(empty)') %>
+                        </span>
+                        <span class="record-detail__history-change-arrow">→</span>
+                        <span class="record-detail__history-change-new">
+                          <%= obfuscate_sensitive_data(@record, key, new_value) || t('admin.labels.empty', default: '(empty)') %>
+                        </span>
+                      </span>
+                    </div>
+                  <% end %>
+                <% end %>
+              <% elsif version.event == 'destroy' %>
+                <div class="record-detail__history-event-badge record-detail__history-event-badge--destroyed">
+                  <%= t('admin.labels.destroyed', default: 'Destroyed') %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Pagination Footer -->
+      <%= render partial: "admin/records/pagination_footer", locals: {
+        pagy: @pagy,
+        record_name: t('admin.labels.versions', default: 'versions')
+      } %>
+    </div>
+    <% else %>
+      <div class="record-detail__attributes">
+        <div class="record-detail__attribute">
+          <span class="record-detail__attribute-value">
+            <%= t('admin.labels.no_history', default: 'No history available for this record.') %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

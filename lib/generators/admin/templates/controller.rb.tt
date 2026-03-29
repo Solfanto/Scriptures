@@ -1,0 +1,53 @@
+class Admin::<%= class_name.pluralize %>Controller < Admin::RecordsController
+  private
+
+  def record_scope
+    <%= model_class %>.all
+  end
+
+  def record_path(...)
+    admin_<%= singular_name %>_path(...)
+  end
+
+  def record_class
+    <%= model_class %>
+  end
+
+  def index_columns
+    %w[<%= index_columns.join(' ') %>]
+  end
+
+  def show_columns
+    %w[<%= show_columns.join(' ') %>]
+  end
+
+  def edit_columns
+    # Define editable columns here
+    # Example: %w[name email status]
+    []
+  end
+
+  def column_widths
+    # Define column widths for index view
+    # Example: { name: "200px", email: "200px" }.with_indifferent_access
+    {}.with_indifferent_access
+  end
+
+  def column_titles
+    # Define custom column titles
+    # Example: { created_at: "Created", updated_at: "Updated" }.with_indifferent_access
+    {}.with_indifferent_access
+  end
+
+  def record_params
+    # Define permitted parameters for create/update
+    # Example: params.require(:<%= singular_name %>).permit(:name, :email, :status)
+    params.require(:<%= singular_name %>).permit()
+  end
+
+  def filter_query_class
+    # Define the filter query class for this resource
+    # Example: Admin::FiltersQuery::<%= model_class %>FiltersQuery
+    Admin::FiltersQuery::Base
+  end
+end

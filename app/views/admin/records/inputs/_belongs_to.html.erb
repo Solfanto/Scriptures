@@ -1,0 +1,62 @@
+<%# locals: (form:, field_name:, association_class: nil, association_records: [], css_class: "") %>
+<%
+  # For belongs_to associations, we expect a single record
+  selected_record = association_records.is_a?(Array) ? association_records.first : association_records
+
+  # Determine field name for hidden fields
+  field_name_for_form = "#{field_name}_id"
+
+  # Determine button text
+  button_text = t("admin.labels.select_association",
+    default: "Select %{association_class}",
+    association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize).downcase)
+
+  select_label = t("admin.labels.select_association", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize).downcase, default: "Select %{association_class}")
+  add_label = t("admin.labels.add_associations", association_class: t("activerecord.models.#{association_class.underscore.pluralize}", default: association_class.to_s.pluralize.titleize.downcase), default: "Add %{association_class}")
+  cancel_label = t("admin.labels.cancel", default: "Cancel")
+  search_placeholder = t("admin.labels.search_association", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize.downcase), default: "Search %{association_class}...")
+  no_records_found = t("admin.labels.no_associations_found", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize.downcase), default: "No %{association_class} found")
+  create_new = t("admin.labels.create_new_association", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize.downcase), default: "Create new %{association_class}")
+  no_associations = t("admin.labels.no_associations", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize.downcase), default: "No %{association_class} associated")
+%>
+
+<div class="<%= class_names("record-edit__field-association", css_class) %>"
+     data-controller="association-selector"
+     data-association-selector-model-value="<%= form.object.class.name.underscore %>"
+     data-association-selector-field-value="<%= field_name_for_form %>"
+     data-association-selector-class-value="<%= association_class %>"
+     data-association-selector-association-type-value="belongs_to"
+     data-association-selector-selected-record-ids-value="<%= selected_record ? [selected_record.id] : [] %>"
+     data-association-selector-select-label-value="<%= select_label %>"
+     data-association-selector-add-selected-label-value="<%= add_label %>"
+     data-association-selector-cancel-label-value="<%= cancel_label %>"
+     data-association-selector-search-placeholder-label-value="<%= search_placeholder %>"
+     data-association-selector-no-records-found-label-value="<%= no_records_found %>"
+     data-association-selector-create-new-label-value="<%= create_new %>"
+     data-association-selector-no-associations-label-value="<%= no_associations %>">
+  <div class="record-edit__field-association-header">
+    <button type="button" class="btn btn--small btn--secondary" data-action="click->association-selector#showModal">
+      <%= button_text %>
+    </button>
+  </div>
+  <div class="record-edit__field-association-list" data-association-selector-target="associationList">
+    <% if selected_record %>
+      <div class="record-edit__field-association-item" data-record-id="<%= selected_record.id %>">
+        <span class="record-edit__field-association-name"><%= record_display_name(selected_record) %></span>
+        <button type="button" class="record-edit__field-association-remove" data-action="click->association-selector#removeRecord" data-record-id="<%= selected_record.id %>">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    <% else %>
+      <div class="record-edit__field-association-empty">
+        <%= t("admin.labels.no_associated_record", default: "No associated record", association_class: t("activerecord.models.#{association_class.underscore}", default: association_class.to_s.titleize).downcase) %>
+      </div>
+    <% end %>
+  </div>
+  <!-- Hidden field for selected record ID -->
+  <% if selected_record %>
+    <%= form.hidden_field field_name_for_form, value: selected_record.id %>
+  <% end %>
+</div>

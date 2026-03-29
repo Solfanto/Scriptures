@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
 
   def create
     browser_token = SecureRandom.urlsafe_base64(32)
-    magic_token = MagicToken.generate_for(params[:email_address], browser_token: browser_token)
+    magic_token = MagicToken.generate_for(params[:email], browser_token: browser_token)
     cookies.signed[:browser_token] = { value: browser_token, expires: MagicToken::LIFETIME, httponly: true, same_site: :lax }
     SessionMailer.magic_link(magic_token.user, magic_token.token, magic_token.short_code).deliver_later
     redirect_to session_verification_path

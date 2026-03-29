@@ -3,6 +3,6 @@ class SessionMailer < ApplicationMailer
     @user = user
     @url = session_magic_token_url(token: token)
     @short_code = short_code
-    mail subject: "Sign in to Scriptures", to: user.email_address
+    mail subject: "Sign in to Scriptures", to: user.email
   end
 end

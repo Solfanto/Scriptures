@@ -16,7 +16,7 @@ class AnnotationCommentsControllerTest < ActionDispatch::IntegrationTest
   test "create rejects non-member" do
     group = Group.create!(name: "Test", owner: users(:scholar))
     annotation = users(:scholar).annotations.create!(passage: passages(:genesis_one_one), body: "Note", group: group)
-    other = User.create!(email_address: "outsider@example.com")
+    other = User.create!(email: "outsider@example.com")
     sign_in_as(other)
 
     assert_no_difference "AnnotationComment.count" do

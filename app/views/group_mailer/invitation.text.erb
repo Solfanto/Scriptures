@@ -1,4 +1,4 @@
-<%= @invitation.invited_by.display_name.presence || @invitation.invited_by.email_address %> has invited you to join "<%= @group.name %>" as a <%= @invitation.role %> on Scriptures.
+<%= @invitation.invited_by.display_name.presence || @invitation.invited_by.email %> has invited you to join "<%= @group.name %>" as a <%= @invitation.role %> on Scriptures.
 
 <%= @group.description if @group.description.present? %>
 

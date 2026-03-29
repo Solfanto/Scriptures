@@ -43,7 +43,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
 
   test "show rejects private group without membership" do
     group = Group.create!(name: "Private", owner: users(:scholar))
-    other = User.create!(email_address: "other@example.com")
+    other = User.create!(email: "other@example.com")
     sign_in_as(other)
     get group_path(group)
     assert_redirected_to root_path
@@ -68,7 +68,7 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
 
   test "leave removes membership" do
     group = Group.create!(name: "Test", owner: users(:scholar))
-    other = User.create!(email_address: "member@example.com")
+    other = User.create!(email: "member@example.com")
     group.group_memberships.create!(user: other, role: "viewer")
     sign_in_as(other)
     delete group_membership_path(group)

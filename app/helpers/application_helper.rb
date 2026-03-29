@@ -1,4 +1,5 @@
 module ApplicationHelper
+
   def sidebar_link(label, icon, path, active: false)
     base = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group"
     active_class = "bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100"

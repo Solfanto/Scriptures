@@ -1,0 +1,98 @@
+<%%# locals: (create_button_text: "Create #{record_class.to_s.titleize}", update_button_text: "Update #{record_class.to_s.titleize}") %>
+
+<%%
+  form_url = @record.persisted? ? record_path(id: @record.id) : url_for(controller: params[:controller], action: :create)
+  form_method = @record.persisted? ? :patch : :post
+%>
+<%%= form_with model: @record, url: form_url, method: form_method, local: true, class: "record-edit__form" do |f| %>
+  <div class="record-edit__form-body">
+    <%% if @record.errors.any? %>
+      <div class="record-edit__errors">
+        <div class="record-edit__errors-header">
+          <h3 class="record-edit__errors-title"><%%= t("admin.labels.please_fix_errors", default: "Please fix the following errors:") %></h3>
+        </div>
+        <ul class="record-edit__errors-list">
+          <%% @record.errors.full_messages.each do |message| %>
+            <li class="record-edit__errors-item"><%%= message %></li>
+          <%% end %>
+        </ul>
+      </div>
+    <%% end %>
+
+    <div class="record-edit__fields">
+      <%% edit_columns.each do |column| %>
+        <%% key = column.to_s %>
+        <%% field_type = @record.class.columns_hash[key]&.type %>
+        <%% label = column_titles[key] || t("activerecord.attributes.#{record_class.model_name.i18n_key}.#{key}", default: key.to_s.humanize) %>
+
+        <div class="record-edit__field">
+          <%%= f.label key, class: "record-edit__field-label" do %>
+            <%%= label %>
+            <%% if required_columns.include?(key) %>
+              <span class="record-edit__field-required">*</span>
+            <%% end %>
+          <%% end %>
+
+          <%% if field_type == :boolean %>
+            <%%= render 'admin/records/inputs/boolean', form: f, field_name: key, label: %>
+          <%% elsif @record.class.defined_enums.key?(key) %>
+            <%% enum_options = @record.class.defined_enums[key].keys.map { |value| [I18n.t("activerecord.attributes.#{record_class.model_name.i18n_key}.enum.#{key}.#{value}", default: value&.humanize), value] } %>
+            <%%= render 'admin/records/inputs/enum', form: f, label: label, field_name: key, enum_options: enum_options, required: required_columns.include?(key) %>
+          <%% elsif key == 'email' %>
+            <%%= render 'admin/records/inputs/email', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% elsif key == 'phone' %>
+            <%%= render 'admin/records/inputs/tel', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% elsif key.to_s.ends_with?('country_codes') || key.to_s.ends_with?('citizenship_codes') %>
+            <%%= render 'admin/records/inputs/countries_select', form: f, field_name: key, placeholder: t("admin.labels.search_for_country", default: "Search for a country..."), required: required_columns.include?(key) %>
+          <%% elsif key.to_s.ends_with?('country_code') || key.to_s.ends_with?('citizenship_code') %>
+            <%%= render 'admin/records/inputs/country_select', form: f, field_name: key, placeholder: t("admin.labels.search_for_country", default: "Search for a country..."), required: required_columns.include?(key) %>
+          <%% elsif association_field?(key) %>
+            <%% association_class = get_association_class(key) %>
+            <%% association_records = @record.public_send(key) %>
+            <%% association = @record.class.reflect_on_association(key.to_sym) %>
+            <%% if association&.macro == :belongs_to %>
+              <%%= render 'admin/records/inputs/belongs_to', form: f, field_name: key, association_class:, association_records: %>
+            <%% else %>
+              <%%= render 'admin/records/inputs/association', form: f, field_name: key, association_class:, association_records: %>
+            <%% end %>
+          <%% elsif key == 'password' %>
+            <%%= render 'admin/records/inputs/password', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% elsif key == 'password_confirmation' %>
+            <%%= render 'admin/records/inputs/password_confirmation', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% elsif jsonb_field?(key) %>
+            <%%= render 'admin/records/inputs/jsonb', form: f, field_name: key %>
+          <%% elsif field_type == :date %>
+            <%%= render 'admin/records/inputs/date', form: f, field_name: key, required: required_columns.include?(key), min: date_validation_min_date(@record.class), max: date_validation_max_date(@record.class) %>
+          <%% elsif field_type == :datetime %>
+            <%%= render 'admin/records/inputs/datetime', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% elsif key == 'amount' %>
+            <%%= render 'admin/records/inputs/money', form: f, field_name: key, required: required_columns.include?(key)  %>
+          <%% elsif key.to_s.downcase.include?('photo') && @record.class.reflect_on_attachment(key.to_sym) %>
+            <%%= render 'admin/records/inputs/photo', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% else %>
+            <%%= render 'admin/records/inputs/text', form: f, field_name: key, required: required_columns.include?(key) %>
+          <%% end %>
+
+          <%% if @record.errors[key].any? %>
+            <div class="record-edit__field-error">
+              <%%= @record.errors[key].first %>
+            </div>
+          <%% end %>
+        </div>
+      <%% end %>
+    </div>
+  </div>
+
+  <div class="record-edit__actions">
+    <%%
+      cancel_url = @record.persisted? ? record_path(id: @record.id) : url_for(controller: params[:controller], action: :index)
+      if @record.persisted?
+        submit_text = update_button_text || t("admin.labels.update", record_name: t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize), default: "Update %{record_name}")
+      else
+        submit_text = create_button_text || t("admin.labels.create", record_name: t("activerecord.models.#{record_class.model_name.i18n_key}", default: record_class.to_s.titleize), default: "Create %{record_name}")
+      end
+    %>
+    <%%= f.submit submit_text, class: "btn btn--primary record-edit__submit" %>
+    <%%= link_to t("admin.labels.cancel", default: "Cancel"), cancel_url, class: "btn btn--secondary record-edit__cancel" %>
+  </div>
+<%% end %>

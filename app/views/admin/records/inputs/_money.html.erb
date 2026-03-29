@@ -1,0 +1,14 @@
+<%# locals: (form:, field_name:, css_class: "", required: false) %>
+
+<div class="record-edit__field-input-group">
+  <%= form.text_field field_name,
+      value: form.object.send(field_name),
+      pattern: "[\\d]*[\\.,]?[\\d]{0,2}",
+      title: t("admin.labels.must_be_number_with_decimals", default: "Must be a number with up to 2 decimal places"),
+      class: class_names("record-edit__field-input form-input", css_class) %>
+  <%= form.select "#{field_name}_currency",
+      options_for_select([['EUR', 'EUR'], ['USD', 'USD']], form.object.send(field_name)&.currency || 'EUR'),
+      {},
+      class: class_names("record-edit__field-input-currency form-select", css_class),
+      required: %>
+</div>

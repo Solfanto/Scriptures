@@ -1,0 +1,47 @@
+<%# locals: (form:, field_name:, options: [], placeholder: "Search...", css_class: "", required: false) %>
+
+<div class="<%= class_names("filterable-select", css_class) %>"
+     data-controller="filterable-select"
+     data-filterable-select-placeholder-value="<%= placeholder %>">
+
+  <div class="filterable-select__input-wrapper">
+    <input type="text"
+           name=""
+           value=""
+           placeholder="<%= placeholder %>"
+           autocomplete="off"
+           class="filterable-select__input record-edit__field-input"
+           data-filterable-select-target="input"
+           data-action="input->filterable-select#filter keydown->filterable-select#keydown click->filterable-select#showDropdown"
+           <%= "required" if required %> />
+
+    <div class="filterable-select__clear"
+         data-filterable-select-target="clear"
+         data-action="click->filterable-select#clearSelection"
+         title="<%= t('admin.labels.clear_selection', default: 'Clear selection') %>">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </div>
+
+    <div class="filterable-select__toggle"
+         data-action="click->filterable-select#toggleDropdown"
+         title="<%= t('admin.labels.open_options_list', default: 'Open options list') %>">
+      <!-- Arrow is handled by CSS background-image -->
+    </div>
+  </div>
+
+  <div class="filterable-select__dropdown" data-filterable-select-target="dropdown">
+    <% options.each do |option| %>
+      <div class="filterable-select__option"
+           data-value="<%= option[:value] %>"
+           data-action="click->filterable-select#selectOption">
+        <%= option[:text] %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= form.hidden_field field_name,
+      class: "filterable-select__hidden-field",
+      data: { filterable_select_target: "hiddenField" } %>
+</div>

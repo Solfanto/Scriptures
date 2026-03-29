@@ -8,8 +8,8 @@
 
     <%= form_with model: @user, url: account_path, class: "space-y-6" do |form| %>
       <div>
-        <%= form.label :email_address, class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
-        <%= form.email_field :email_address, disabled: true, class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 px-3 py-2.5 text-sm text-stone-500" %>
+        <%= form.label :email, class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
+        <%= form.email_field :email, disabled: true, class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 px-3 py-2.5 text-sm text-stone-500" %>
       </div>
 
       <div>

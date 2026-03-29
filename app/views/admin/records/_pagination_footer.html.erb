@@ -1,0 +1,12 @@
+<%# locals: (pagy:, record_name:) %>
+<div class="records__footer">
+  <div class="records__pagination">
+    <%== pagy.series_nav if pagy.pages > 1 %>
+  </div>
+
+  <% if pagy.pages > 1 && local_assigns[:record_name] %>
+    <div class="records__pagination-info">
+      <%= t("admin.labels.showing", from: pagy.from, to: pagy.to, count: pagy.count, record_name: record_name, default: "Showing %{from} to %{to} of %{count} %{record_name}") %>
+    </div>
+  <% end %>
+</div>

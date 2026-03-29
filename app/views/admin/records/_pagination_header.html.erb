@@ -1,0 +1,28 @@
+<%# locals: (available_page_sizes:, limit_param_name: :limit, exclude_params: []) %>
+<% limit_param_name ||= :limit %>
+<% exclude_params ||= [:limit] %>
+<div class="records__pagination-form">
+  <%= form_with url: request.path, method: :get, class: "records__page-size-form", data: { turbo: true, turbo_frame: "_self", turbo_action: "advance", controller: "pagination", pagination_target: "form" } do |f| %>
+    <% request.query_parameters.except(*exclude_params).each do |key, value| %>
+      <% if value.is_a?(Hash) %>
+        <% value.each do |sub_key, sub_value| %>
+          <%= f.hidden_field "#{key}[#{sub_key}]", value: sub_value %>
+        <% end %>
+      <% else %>
+        <%= f.hidden_field key, value: value %>
+      <% end %>
+    <% end %>
+    <%= f.label limit_param_name, class: "records__page-size-label" do %>
+      <%
+        page_size_options = if available_page_sizes.present? && available_page_sizes.first.is_a?(Array)
+          available_page_sizes
+        else
+          available_page_sizes.map { |size| [ size, size ] }
+        end
+        selected_value = params[limit_param_name] || (available_page_sizes.first.is_a?(Array) ? available_page_sizes.first.last : available_page_sizes.first)
+      %>
+      <%= f.select limit_param_name, options_for_select(page_size_options, selected: selected_value), {}, { data: { action: "change->pagination#submitForm" }, class: "records__page-size-select" } %>
+      <span class="records__page-size-label"><%= t("admin.labels.per_page", default: "per page") %></span>
+    <% end %>
+  <% end %>
+</div>

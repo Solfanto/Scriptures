@@ -1,0 +1,8 @@
+<%%# locals: (form:, field_name:, label: field_name.to_s.humanize, css_class: "") %>
+
+<div class="<%%= class_names("record-edit__field-input-wrapper", css_class) %>">
+  <%%= form.check_box field_name, class: "record-edit__field-checkbox" %>
+  <%%= form.label field_name, class: "record-edit__field-checkbox-label" do %>
+    <%%= t("activerecord.attributes.#{record_class.model_name.i18n_key}.#{field_name}", default: label.to_s.humanize) %>
+  <%% end %>
+</div>

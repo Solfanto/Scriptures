@@ -3,7 +3,7 @@ require "test_helper"
 class Groups::MembershipsControllerTest < ActionDispatch::IntegrationTest
   test "destroy lets member leave" do
     group = Group.create!(name: "Test", owner: users(:scholar))
-    other = User.create!(email_address: "member@example.com")
+    other = User.create!(email: "member@example.com")
     group.group_memberships.create!(user: other, role: "viewer")
     sign_in_as(other)
 
@@ -14,7 +14,7 @@ class Groups::MembershipsControllerTest < ActionDispatch::IntegrationTest
 
   test "destroy lets owner remove member" do
     group = Group.create!(name: "Test", owner: users(:scholar))
-    other = User.create!(email_address: "member@example.com")
+    other = User.create!(email: "member@example.com")
     group.group_memberships.create!(user: users(:scholar), role: "owner")
     group.group_memberships.create!(user: other, role: "viewer")
     sign_in_as(users(:scholar))

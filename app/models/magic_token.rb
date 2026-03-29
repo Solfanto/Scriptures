@@ -13,8 +13,8 @@ class MagicToken < ApplicationRecord
     expires_at <= Time.current
   end
 
-  def self.generate_for(email_address, browser_token:)
-    user = User.find_or_create_by!(email_address: email_address)
+  def self.generate_for(email, browser_token:)
+    user = User.find_or_create_by!(email: email)
     user.magic_tokens.create!(browser_token: browser_token)
   end
 

@@ -1,0 +1,25 @@
+<% content_for :title, "#{t('activerecord.models.' + record_class.model_name.i18n_key.to_s.pluralize, default: record_class.to_s.titleize.pluralize)} | #{t('admin.labels.admin', default: 'Admin')}" %>
+
+<div class="records-index">
+  <%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <%= render partial: "records", locals: {
+    record_class:,
+    records: @records,
+    record_path: -> (id:) { record_path(id:) },
+    index_columns:,
+    column_widths:,
+    column_titles:,
+    filterable_columns:,
+    filter_enabled: filter_enabled?,
+    authorized_for_create: authorized_for_create?,
+    pagy: @pagy,
+    available_page_sizes:,
+    sort_params:,
+    limit_param_name: :limit,
+    link_column_key:,
+    export_csv_index: export_csv_index?,
+    authorized_for_import: respond_to?(:authorized_for_import?, true) ? authorized_for_import? : nil
+  } %>
+</div>

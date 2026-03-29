@@ -50,7 +50,7 @@
         <% @memberships.each do |m| %>
           <div class="flex items-center justify-between py-2">
             <div>
-              <span class="text-sm font-medium"><%= m.user.display_name.presence || m.user.email_address %></span>
+              <span class="text-sm font-medium"><%= m.user.display_name.presence || m.user.email %></span>
               <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-500"><%= m.role.capitalize %></span>
             </div>
             <% if authenticated? && @group.owner == current_user && m.user != @group.owner %>
@@ -130,13 +130,13 @@
             <div class="p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
               <div class="flex items-center gap-2 mb-1">
                 <span class="text-[10px] font-bold text-stone-400 uppercase"><%= ann.scripture.name %> <%= ann.passage.division.number %>:<%= ann.passage.number %></span>
-                <span class="text-[10px] text-blue-500"><%= ann.user.display_name.presence || ann.user.email_address %></span>
+                <span class="text-[10px] text-blue-500"><%= ann.user.display_name.presence || ann.user.email %></span>
               </div>
               <p class="text-xs text-stone-600 dark:text-stone-400"><%= ann.body.truncate(120) %></p>
               <% if ann.annotation_comments.any? %>
                 <div class="mt-2 pl-2 border-l border-stone-200 dark:border-stone-800 space-y-1">
                   <% ann.annotation_comments.limit(3).each do |c| %>
-                    <p class="text-[10px] text-stone-500"><strong><%= c.user.display_name.presence || c.user.email_address %></strong>: <%= c.body.truncate(80) %></p>
+                    <p class="text-[10px] text-stone-500"><strong><%= c.user.display_name.presence || c.user.email %></strong>: <%= c.body.truncate(80) %></p>
                   <% end %>
                 </div>
               <% end %>
@@ -162,7 +162,7 @@
           <% @activities.each do |activity| %>
             <div class="py-2 border-b border-stone-100 dark:border-stone-900 last:border-0">
               <p class="text-xs text-stone-600 dark:text-stone-400">
-                <strong><%= activity.user.display_name.presence || activity.user.email_address %></strong>
+                <strong><%= activity.user.display_name.presence || activity.user.email %></strong>
                 <%= activity.action %>
                 <span class="text-stone-400"><%= activity.trackable_type.underscore.humanize.downcase %></span>
               </p>

@@ -1,6 +1,6 @@
 <p style="margin: 0 0 16px; font-size: 15px; color: #1c1917; line-height: 1.6;">Hi,</p>
 
-<p style="margin: 0 0 16px; font-size: 14px; color: #57534e; line-height: 1.6;"><strong><%= @invitation.invited_by.display_name.presence || @invitation.invited_by.email_address %></strong> has invited you to join <strong><%= @group.name %></strong> as a <strong><%= @invitation.role %></strong> on Scriptures.</p>
+<p style="margin: 0 0 16px; font-size: 14px; color: #57534e; line-height: 1.6;"><strong><%= @invitation.invited_by.display_name.presence || @invitation.invited_by.email %></strong> has invited you to join <strong><%= @group.name %></strong> as a <strong><%= @invitation.role %></strong> on Scriptures.</p>
 
 <% if @group.description.present? %>
   <p style="margin: 0 0 20px; font-size: 13px; color: #78716c; line-height: 1.5;"><%= @group.description %></p>

@@ -1,0 +1,56 @@
+<div class="sidebar" data-controller="sidebar" data-sidebar-target="sidebar">
+  <div class="sidebar__header">
+    <div class="sidebar__logo">
+      <div class="sidebar__logo-icon <%%= 'sidebar__logo-icon--production' if Rails.env.production? %>">
+        A
+      </div>
+      <div>
+        <div class="sidebar__logo-title">Admin</div>
+        <div class="sidebar__logo-env"><%%= Rails.env %></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav">
+    <%%= link_to admin_root_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'dashboard'}" do %>
+      <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span class="sidebar__text"><%%= t("admin.sidebar.dashboard", default: "Dashboard") %></span>
+    <%% end %>
+
+    <div class="sidebar__section">
+      <span class="sidebar__section-title"><%%= t("admin.sidebar.resources", default: "Resources") %></span>
+    </div>
+
+    <!-- Generator: new sidebar links above -->
+
+    <div class="sidebar__section">
+      <span class="sidebar__section-title"><%%= t("admin.sidebar.system", default: "System") %></span>
+    </div>
+
+    <%%= link_to root_path, class: "sidebar__link" do %>
+      <svg class="sidebar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      <span class="sidebar__text"><%%= t("admin.sidebar.back_to_website", default: "Back to website") %></span>
+    <%% end %>
+  </nav>
+
+  <div class="sidebar__footer">
+    <%% if Current.user %>
+      <div class="sidebar__user">
+        <span class="sidebar__user-email"><%%= Current.user.email %></span>
+      </div>
+    <%% end %>
+  </div>
+</div>
+
+<div class="sidebar__overlay" data-sidebar-target="overlay" data-action="click->sidebar#closeSidebar"></div>
+
+<button class="mobile-menu-btn" data-action="click->sidebar#toggleSidebar" data-sidebar-target="hamburger">
+  <svg class="mobile-menu-btn__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+</button>

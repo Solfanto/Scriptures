@@ -6,8 +6,8 @@ module PasskeyCredentials
       options = WebAuthn::Credential.options_for_create(
         user: {
           id: WebAuthn.generate_user_id,
-          name: current_user.email_address,
-          display_name: current_user.display_name || current_user.email_address
+          name: current_user.email,
+          display_name: current_user.display_name || current_user.email
         },
         exclude: current_user.passkey_credentials.pluck(:external_id)
       )

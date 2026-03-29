@@ -10,7 +10,7 @@ class GroupInvitationTest < ActiveSupport::TestCase
   test "accept! creates membership" do
     group = Group.create!(name: "Test", owner: users(:scholar))
     inv = group.group_invitations.create!(email: "new@example.com", invited_by: users(:scholar), role: "editor")
-    new_user = User.create!(email_address: "new@example.com")
+    new_user = User.create!(email: "new@example.com")
 
     assert_difference "GroupMembership.count", 1 do
       inv.accept!(new_user)

@@ -36,6 +36,7 @@ plugin :tmp_restart
 
 # Compile Tailwind CSS on startup and watch for changes in development.
 plugin :tailwindcss if ENV.fetch("RAILS_ENV", "development") == "development"
+plugin :tailwindcss_admin if ENV.fetch("RAILS_ENV", "development") == "development"
 
 # Run the Solid Queue supervisor inside of Puma for single-server deployments.
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]

@@ -6,7 +6,7 @@ class PresenceChannel < ApplicationCable::Channel
       self.class.broadcast_to(group, {
         type: "join",
         user_id: current_user.id,
-        user: current_user.display_name || current_user.email_address
+        user: current_user.display_name || current_user.email
       })
     else
       reject
@@ -18,7 +18,7 @@ class PresenceChannel < ApplicationCable::Channel
     self.class.broadcast_to(group, {
       type: "reading",
       user_id: current_user.id,
-      user: current_user.display_name || current_user.email_address,
+      user: current_user.display_name || current_user.email,
       passage_ref: data["passage_ref"]
     })
   end
