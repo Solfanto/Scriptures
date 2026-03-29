@@ -14,22 +14,22 @@
 
       <div>
         <%= form.label :display_name, class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
-        <%= form.text_field :display_name, placeholder: "How should we address you?", class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+        <%= form.text_field :display_name, placeholder: "How should we address you?", class: "form-select block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
       </div>
 
       <div>
         <%= form.label :default_corpus_slug, "Default corpus", class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
-        <%= form.select :default_corpus_slug, Corpus.pluck(:name, :slug), { include_blank: "None" }, class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+        <%= form.select :default_corpus_slug, Corpus.pluck(:name, :slug), { include_blank: "None" }, class: "form-select block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
       </div>
 
       <div>
         <%= form.label :default_translation_abbreviation, "Default translation", class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
-        <%= form.select :default_translation_abbreviation, Translation.pluck(:name, :abbreviation), { include_blank: "None" }, class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+        <%= form.select :default_translation_abbreviation, Translation.pluck(:name, :abbreviation), { include_blank: "None" }, class: "form-select block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
       </div>
 
       <div>
         <%= form.label :language, class: "block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1" %>
-        <%= form.select :language, [["English", "en"], ["Arabic (العربية)", "ar"], ["Hebrew (עברית)", "he"]], {}, class: "block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+        <%= form.select :language, [["English", "en"], ["Arabic (العربية)", "ar"], ["Hebrew (עברית)", "he"]], {}, class: "form-select block w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
       </div>
 
       <%= form.submit "Save settings", class: "rounded-lg px-4 py-2.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-medium cursor-pointer hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>

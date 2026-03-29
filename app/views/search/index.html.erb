@@ -34,14 +34,14 @@
               <%= f.hidden_field :q, value: @query %>
               <%= f.hidden_field :mode, value: @mode %>
               <%= f.hidden_field :scope, value: "tradition" %>
-              <%= f.select :tradition_slug, Tradition.pluck(:name, :slug), { include_blank: "Choose..." }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+              <%= f.select :tradition_slug, Tradition.pluck(:name, :slug), { include_blank: "Choose..." }, class: "form-select rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
             <% end %>
           <% elsif @scope == "corpus" %>
             <%= form_with url: search_path, method: :get, class: "flex items-center gap-1 ml-1" do |f| %>
               <%= f.hidden_field :q, value: @query %>
               <%= f.hidden_field :mode, value: @mode %>
               <%= f.hidden_field :scope, value: "corpus" %>
-              <%= f.select :corpus_slug, Corpus.pluck(:name, :slug), { include_blank: "Choose..." }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+              <%= f.select :corpus_slug, Corpus.pluck(:name, :slug), { include_blank: "Choose..." }, class: "form-select rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
             <% end %>
           <% end %>
         <% end %>
@@ -52,7 +52,7 @@
             <%= f.hidden_field :q, value: @query %>
             <%= f.hidden_field :mode, value: "concordance" %>
             <%= f.hidden_field :scope, value: @scope %>
-            <%= f.select :translation, Translation.distinct.pluck(:abbreviation), { include_blank: "All translations" }, class: "rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
+            <%= f.select :translation, Translation.distinct.pluck(:abbreviation), { include_blank: "All translations" }, class: "form-select rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs", onchange: "this.form.requestSubmit()" %>
           <% end %>
         <% end %>
       </div>
