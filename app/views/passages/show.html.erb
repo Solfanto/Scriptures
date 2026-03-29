@@ -195,26 +195,41 @@
                       <%# Primary text with source criticism coloring %>
                       <% source = passage.source_documents.first %>
                       <% source_color = source_text_class(source&.color) %>
-                      <p class="scripture-text text-2xl md:text-3xl <%= source_color %> <%= 'rtl text-right' if is_rtl %>">
-                        <% text.split(/\s+/).each_with_index do |word, wi| %>
-                          <span class="hover:bg-stone-200 dark:hover:bg-stone-800 px-1 rounded cursor-help transition-colors inline-block"
-                                data-action="mouseenter->word-tooltip#show mouseleave->word-tooltip#hide"
-                                data-word="<%= word %>"
-                                data-passage-id="<%= passage.id %>"
-                                data-position="<%= wi + 1 %>"><%= word %> </span>
-                        <% end %>
-                      </p>
+                      <div class="flex items-start gap-2">
+                        <p class="scripture-text text-2xl md:text-3xl <%= source_color %> <%= 'rtl text-right' if is_rtl %> flex-1">
+                          <% text.split(/\s+/).each_with_index do |word, wi| %>
+                            <span class="hover:bg-stone-200 dark:hover:bg-stone-800 px-1 rounded cursor-help transition-colors inline-block"
+                                  data-action="mouseenter->word-tooltip#show mouseleave->word-tooltip#hide"
+                                  data-word="<%= word %>"
+                                  data-passage-id="<%= passage.id %>"
+                                  data-position="<%= wi + 1 %>"><%= word %> </span>
+                          <% end %>
+                        </p>
+                        <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                            <%= speaker_icon %>
+                          </button>
+                        </span>
+                      </div>
                     <% else %>
-                      <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 <%= 'rtl text-right' if is_rtl %>">
-                        <%= text %>
-                      </p>
+                      <div class="flex items-start gap-2">
+                        <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 <%= 'rtl text-right' if is_rtl %> flex-1">
+                          <%= text %>
+                        </p>
+                        <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                            <%= speaker_icon(size: 12) %>
+                          </button>
+                        </span>
+                      </div>
                     <% end %>
                   <% end %>
-                  <%# Citation copy button (available to all users) %>
+                  <%# Passage action toolbar — single row %>
                   <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div class="relative">
-                      <button data-action="click->citation#toggle" class="text-xs text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" title="Copy citation">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <%# Copy citation %>
+                    <div class="relative" data-tooltip="Copy citation">
+                      <button data-action="click->citation#toggle" class="text-xs text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                        <%= copy_icon %>
                       </button>
                       <span data-citation-target="feedback" style="display: none" class="text-[10px] text-green-600 dark:text-green-400 ml-1">Copied!</span>
                       <div data-citation-target="menu" style="display: none" class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-44">
@@ -227,30 +242,36 @@
                         <button data-action="click->citation#copyHTML" class="w-full text-left px-3 py-1.5 text-xs hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">HTML</button>
                       </div>
                     </div>
-                  </div>
 
-                  <%# Passage action buttons (bookmark, annotate, collect) %>
-                  <% if authenticated? %>
-                    <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <% if authenticated? %>
+                      <%# Bookmark %>
                       <% if @bookmarked_ids.include?(passage.id) %>
-                        <%= button_to bookmark_path(current_user.bookmarks.find_by(passage: passage)), method: :delete, class: "text-xs text-amber-500 hover:text-amber-600 transition-colors", title: "Remove bookmark" do %>
-                          <%= bookmark_icon(size: 14) %>
-                        <% end %>
+                        <span data-tooltip="Remove bookmark">
+                          <%= button_to bookmark_path(current_user.bookmarks.find_by(passage: passage)), method: :delete, class: "text-xs text-amber-500 hover:text-amber-600 transition-colors" do %>
+                            <%= bookmark_icon(size: 14) %>
+                          <% end %>
+                        </span>
                       <% else %>
-                        <%= button_to bookmarks_path(passage_id: passage.id), class: "text-xs text-stone-400 hover:text-amber-500 transition-colors", title: "Bookmark" do %>
-                          <%= bookmark_icon(size: 14) %>
-                        <% end %>
+                        <span data-tooltip="Bookmark">
+                          <%= button_to bookmarks_path(passage_id: passage.id), class: "text-xs text-stone-400 hover:text-amber-500 transition-colors" do %>
+                            <%= bookmark_icon(size: 14) %>
+                          <% end %>
+                        </span>
                       <% end %>
 
-                      <button data-action="click->passage-actions#toggleAnnotation"
-                              data-passage-id="<%= passage.id %>"
-                              class="text-xs text-stone-400 hover:text-blue-500 transition-colors" title="Annotate">
-                        <%= annotation_icon(size: 14) %>
-                      </button>
+                      <%# Annotate %>
+                      <span data-tooltip="Annotate">
+                        <button data-action="click->passage-actions#toggleAnnotation"
+                                data-passage-id="<%= passage.id %>"
+                                class="text-xs text-stone-400 hover:text-blue-500 transition-colors">
+                          <%= annotation_icon(size: 14) %>
+                        </button>
+                      </span>
 
+                      <%# Add to collection %>
                       <% if @user_collections.any? %>
-                        <details class="relative">
-                          <summary class="text-xs text-stone-400 hover:text-green-500 transition-colors cursor-pointer list-none" title="Add to collection">
+                        <details class="relative" data-tooltip="Add to collection">
+                          <summary class="text-xs text-stone-400 hover:text-green-500 transition-colors cursor-pointer list-none">
                             <%= collection_icon(size: 14) %>
                           </summary>
                           <div class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-40">
@@ -263,9 +284,10 @@
                         </details>
                       <% end %>
 
+                      <%# Add to curriculum %>
                       <% if @user_curricula.any? %>
-                        <details class="relative">
-                          <summary class="text-xs text-stone-400 hover:text-purple-500 transition-colors cursor-pointer list-none" title="Add to curriculum">
+                        <details class="relative" data-tooltip="Add to curriculum">
+                          <summary class="text-xs text-stone-400 hover:text-purple-500 transition-colors cursor-pointer list-none">
                             <%= curriculum_icon(size: 14) %>
                           </summary>
                           <div class="absolute left-0 top-6 z-10 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1 min-w-40">
@@ -278,17 +300,22 @@
                         </details>
                       <% end %>
 
+                      <%# Mark read/unread %>
                       <% if @read_passage_ids.include?(passage.id) %>
-                        <%= button_to reading_progress_path(passage_id: passage.id), method: :delete, class: "text-xs text-blue-500 hover:text-blue-600 transition-colors", title: "Mark unread" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        <% end %>
+                        <span data-tooltip="Mark unread">
+                          <%= button_to reading_progress_path(passage_id: passage.id), method: :delete, class: "text-xs text-blue-500 hover:text-blue-600 transition-colors" do %>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                          <% end %>
+                        </span>
                       <% else %>
-                        <%= button_to reading_progresses_path(passage_id: passage.id), class: "text-xs text-stone-400 hover:text-blue-500 transition-colors", title: "Mark as read" do %>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
-                        <% end %>
+                        <span data-tooltip="Mark as read">
+                          <%= button_to reading_progresses_path(passage_id: passage.id), class: "text-xs text-stone-400 hover:text-blue-500 transition-colors" do %>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                          <% end %>
+                        </span>
                       <% end %>
-                    </div>
-                  <% end %>
+                    <% end %>
+                  </div>
 
                   <%# Inline annotations %>
                   <% if (annotations = @user_annotations[passage.id]) %>
