@@ -39,6 +39,19 @@ Rails.application.routes.draw do
     end
   end
 
+  # Groups & collaboration
+  resources :groups, only: %i[index show new create edit update destroy] do
+    member do
+      post :invite
+      delete :remove_member
+      delete :leave
+    end
+    collection do
+      get :accept_invitation
+    end
+  end
+  resources :annotation_comments, only: %i[create destroy]
+
   # Research tools
   resources :curricula, only: %i[index show new create edit update destroy] do
     member do

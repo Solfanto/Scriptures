@@ -1,0 +1,10 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Groups", groups_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100">New</span>
+  </div>
+
+  <h1 class="font-bold text-2xl mb-6">New Group</h1>
+  <%= render "form", group: @group %>
+</div>

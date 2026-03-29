@@ -1,0 +1,9 @@
+<%= @invitation.invited_by.display_name.presence || @invitation.invited_by.email_address %> has invited you to join "<%= @group.name %>" as a <%= @invitation.role %> on Scriptures.
+
+<%= @group.description if @group.description.present? %>
+
+Accept the invitation by visiting:
+
+<%= @url %>
+
+If you don't have an account, one will be created when you accept.

@@ -12,6 +12,10 @@ class User < ApplicationRecord
   has_many :ratings, dependent: :destroy
   has_many :curricula, class_name: "Curriculum", dependent: :destroy
   has_many :reading_progresses, dependent: :destroy
+  has_many :owned_groups, class_name: "Group", foreign_key: :owner_id, dependent: :destroy
+  has_many :group_memberships, dependent: :destroy
+  has_many :groups, through: :group_memberships
+  has_many :annotation_comments, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

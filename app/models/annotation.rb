@@ -1,8 +1,10 @@
 class Annotation < ApplicationRecord
   belongs_to :user
   belongs_to :passage
+  belongs_to :group, optional: true
   has_many :annotation_tags, dependent: :destroy
   has_many :tags, through: :annotation_tags
+  has_many :annotation_comments, dependent: :destroy
 
   validates :body, presence: true
 

@@ -1,0 +1,28 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-bold text-2xl">Groups</h1>
+    <%= link_to "New group", new_group_path, class: "rounded-lg px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+  </div>
+
+  <% if @owned.any? %>
+    <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Your groups</h2>
+    <div class="space-y-3 mb-8">
+      <% @owned.each do |group| %>
+        <%= render "group_card", group: group, role: "Owner" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @member_of.any? %>
+    <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Member of</h2>
+    <div class="space-y-3 mb-8">
+      <% @member_of.each do |group| %>
+        <%= render "group_card", group: group, role: group.role_for(current_user)&.capitalize %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @owned.empty? && @member_of.empty? %>
+    <p class="text-stone-500 text-sm">No groups yet. Create one or accept an invitation to get started.</p>
+  <% end %>
+</div>

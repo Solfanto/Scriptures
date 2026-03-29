@@ -1,0 +1,178 @@
+<div class="h-full overflow-y-auto px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto w-full">
+  <div class="flex items-center gap-2 text-xs font-medium text-stone-500 uppercase tracking-widest mb-8">
+    <%= link_to "Groups", groups_path, class: "hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+    <%= chevron_right_icon %>
+    <span class="text-stone-900 dark:text-stone-100"><%= @group.name %></span>
+  </div>
+
+  <%# Flash %>
+  <% if flash[:notice] %>
+    <div class="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm"><%= flash[:alert] %></div>
+  <% end %>
+
+  <div class="mb-8">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="font-bold text-2xl mb-2"><%= @group.name %></h1>
+        <% if @group.description.present? %>
+          <p class="text-stone-500 text-sm mb-3"><%= @group.description %></p>
+        <% end %>
+        <div class="flex items-center gap-3 text-xs text-stone-400">
+          <span><%= pluralize(@memberships.size, "member") %></span>
+          <% if @group.public? %>
+            <span class="px-1.5 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium">Public</span>
+          <% end %>
+        </div>
+      </div>
+      <% if authenticated? && @group.owner == current_user %>
+        <div class="flex items-center gap-2">
+          <%= link_to "Edit", edit_group_path(@group), class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" %>
+          <%= button_to group_path(@group), method: :delete, class: "text-xs text-red-500 hover:underline", data: { turbo_confirm: "Delete this group and all shared data?" } do %>
+            Delete
+          <% end %>
+        </div>
+      <% elsif authenticated? && @group.member?(current_user) && @group.owner != current_user %>
+        <%= button_to leave_group_path(@group), method: :delete, class: "text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" do %>
+          Leave group
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8">
+    <%# Left column: Members & Invitations %>
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Members</h2>
+      <div class="space-y-2 mb-6">
+        <% @memberships.each do |m| %>
+          <div class="flex items-center justify-between py-2">
+            <div>
+              <span class="text-sm font-medium"><%= m.user.display_name.presence || m.user.email_address %></span>
+              <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-500"><%= m.role.capitalize %></span>
+            </div>
+            <% if authenticated? && @group.owner == current_user && m.user != @group.owner %>
+              <%= button_to remove_member_group_path(@group, user_id: m.user_id), method: :delete, class: "text-xs text-red-500 hover:underline" do %>
+                Remove
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <% if authenticated? && @group.editor?(current_user) %>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Invite</h3>
+        <%= form_with url: invite_group_path(@group), method: :post, class: "space-y-2 mb-4" do |f| %>
+          <%= f.email_field :email, placeholder: "email@example.com", required: true, class: "w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+          <div class="flex items-center gap-2">
+            <%= f.select :role, [["Viewer", "viewer"], ["Editor", "editor"]], {}, class: "form-select flex-1 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+            <%= f.submit "Send", class: "rounded-lg px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-medium cursor-pointer hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+          </div>
+        <% end %>
+
+        <% if @pending_invitations&.any? %>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Pending</h3>
+          <% @pending_invitations.each do |inv| %>
+            <div class="text-xs text-stone-500 py-1"><%= inv.email %> (<%= inv.role %>)</div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%# Presence indicators %>
+      <div id="presence-list" class="mt-4" data-controller="presence" data-presence-group-id-value="<%= @group.id %>">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Online now</h3>
+        <div data-presence-target="list" class="space-y-1">
+          <p class="text-xs text-stone-400 italic">No one online</p>
+        </div>
+      </div>
+    </div>
+
+    <%# Middle column: Shared resources %>
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Collections</h2>
+      <% if @collections.any? %>
+        <div class="space-y-2 mb-6">
+          <% @collections.each do |col| %>
+            <div class="p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+              <%= link_to collection_path(col), class: "text-sm font-medium hover:text-blue-500 transition-colors" do %>
+                <%= col.name %>
+              <% end %>
+              <div class="text-xs text-stone-400"><%= pluralize(col.passages.size, "passage") %></div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-stone-400 italic mb-6">No shared collections yet.</p>
+      <% end %>
+
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Curricula</h2>
+      <% if @curricula.any? %>
+        <div class="space-y-2 mb-6">
+          <% @curricula.each do |cur| %>
+            <div class="p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+              <%= link_to curriculum_path(cur), class: "text-sm font-medium hover:text-blue-500 transition-colors" do %>
+                <%= cur.name %>
+              <% end %>
+              <div class="text-xs text-stone-400"><%= pluralize(cur.curriculum_items.size, "passage") %></div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-stone-400 italic mb-6">No shared curricula yet.</p>
+      <% end %>
+
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Recent annotations</h2>
+      <% if @annotations.any? %>
+        <div class="space-y-2">
+          <% @annotations.each do |ann| %>
+            <div class="p-3 border border-stone-200 dark:border-stone-800 rounded-lg">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-[10px] font-bold text-stone-400 uppercase"><%= ann.scripture.name %> <%= ann.passage.division.number %>:<%= ann.passage.number %></span>
+                <span class="text-[10px] text-blue-500"><%= ann.user.display_name.presence || ann.user.email_address %></span>
+              </div>
+              <p class="text-xs text-stone-600 dark:text-stone-400"><%= ann.body.truncate(120) %></p>
+              <% if ann.annotation_comments.any? %>
+                <div class="mt-2 pl-2 border-l border-stone-200 dark:border-stone-800 space-y-1">
+                  <% ann.annotation_comments.limit(3).each do |c| %>
+                    <p class="text-[10px] text-stone-500"><strong><%= c.user.display_name.presence || c.user.email_address %></strong>: <%= c.body.truncate(80) %></p>
+                  <% end %>
+                </div>
+              <% end %>
+              <% if authenticated? && @group.member?(current_user) %>
+                <%= form_with url: annotation_comments_path(annotation_id: ann.id), method: :post, class: "flex items-center gap-1 mt-2" do |f| %>
+                  <%= f.text_field :body, placeholder: "Comment...", required: true, class: "flex-1 rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-stone-900 dark:focus:ring-stone-100" %>
+                  <%= f.submit "Reply", class: "px-2 py-1 rounded-md bg-stone-200 dark:bg-stone-800 text-xs font-medium cursor-pointer hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-stone-400 italic">No group annotations yet.</p>
+      <% end %>
+    </div>
+
+    <%# Right column: Activity feed %>
+    <div>
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">Activity</h2>
+      <% if @activities.any? %>
+        <div class="space-y-2">
+          <% @activities.each do |activity| %>
+            <div class="py-2 border-b border-stone-100 dark:border-stone-900 last:border-0">
+              <p class="text-xs text-stone-600 dark:text-stone-400">
+                <strong><%= activity.user.display_name.presence || activity.user.email_address %></strong>
+                <%= activity.action %>
+                <span class="text-stone-400"><%= activity.trackable_type.underscore.humanize.downcase %></span>
+              </p>
+              <p class="text-[10px] text-stone-400"><%= time_ago_in_words(activity.created_at) %> ago</p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-xs text-stone-400 italic">No activity yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

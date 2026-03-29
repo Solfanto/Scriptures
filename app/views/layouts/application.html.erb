@@ -49,6 +49,7 @@
             <%= sidebar_link "Annotations", annotation_icon, annotations_path(user_id: current_user), active: controller_name == "annotations" %>
             <%= sidebar_link "Collections", collection_icon, collections_path, active: controller_name == "collections" %>
             <%= sidebar_link "Curricula", curriculum_icon, curricula_path, active: controller_name == "curricula" %>
+            <%= sidebar_link "Groups", group_icon, groups_path, active: controller_name == "groups" %>
           <% end %>
         </nav>
 

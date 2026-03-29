@@ -1,0 +1,12 @@
+<div class="flex items-center justify-between p-4 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-stone-400 dark:hover:border-stone-600 transition-colors">
+  <%= link_to group_path(group), class: "flex-1" do %>
+    <div class="flex items-center gap-2">
+      <div class="font-medium"><%= group.name %></div>
+      <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-500"><%= role %></span>
+      <% if group.public? %>
+        <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">Public</span>
+      <% end %>
+    </div>
+    <div class="text-xs text-stone-500 mt-0.5"><%= pluralize(group.group_memberships.size, "member") %></div>
+  <% end %>
+</div>

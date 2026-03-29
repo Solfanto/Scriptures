@@ -2,6 +2,7 @@ class Curriculum < ApplicationRecord
   self.table_name = "curricula"
 
   belongs_to :user
+  belongs_to :group, optional: true
   has_many :curriculum_items, dependent: :destroy
   has_many :passages, through: :curriculum_items
 

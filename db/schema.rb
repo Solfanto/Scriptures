@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_122553) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "annotation_comments", force: :cascade do |t|
+    t.bigint "annotation_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["annotation_id"], name: "index_annotation_comments_on_annotation_id"
+    t.index ["user_id"], name: "index_annotation_comments_on_user_id"
+  end
 
   create_table "annotation_tags", force: :cascade do |t|
     t.integer "annotation_id", null: false
@@ -27,10 +37,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
   create_table "annotations", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.bigint "group_id"
     t.integer "passage_id", null: false
     t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["group_id"], name: "index_annotations_on_group_id"
     t.index ["passage_id"], name: "index_annotations_on_passage_id"
     t.index ["user_id", "passage_id"], name: "index_annotations_on_user_id_and_passage_id"
     t.index ["user_id"], name: "index_annotations_on_user_id"
@@ -60,10 +72,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
   create_table "collections", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.bigint "group_id"
     t.string "name", null: false
     t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["group_id"], name: "index_collections_on_group_id"
     t.index ["user_id"], name: "index_collections_on_user_id"
   end
 
@@ -106,10 +120,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
     t.datetime "created_at", null: false
     t.string "curriculum_type"
     t.text "description"
+    t.bigint "group_id"
     t.string "name", null: false
     t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["group_id"], name: "index_curricula_on_group_id"
     t.index ["user_id"], name: "index_curricula_on_user_id"
   end
 
@@ -136,6 +152,55 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
     t.index ["scripture_id"], name: "index_divisions_on_scripture_id"
+  end
+
+  create_table "group_activities", force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.bigint "group_id", null: false
+    t.bigint "trackable_id", null: false
+    t.string "trackable_type", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["group_id", "created_at"], name: "index_group_activities_on_group_id_and_created_at"
+    t.index ["group_id"], name: "index_group_activities_on_group_id"
+    t.index ["trackable_type", "trackable_id"], name: "index_group_activities_on_trackable_type_and_trackable_id"
+    t.index ["user_id"], name: "index_group_activities_on_user_id"
+  end
+
+  create_table "group_invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.bigint "group_id", null: false
+    t.bigint "invited_by_id", null: false
+    t.string "role", default: "viewer", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_group_invitations_on_group_id"
+    t.index ["invited_by_id"], name: "index_group_invitations_on_invited_by_id"
+    t.index ["token"], name: "index_group_invitations_on_token", unique: true
+  end
+
+  create_table "group_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "group_id", null: false
+    t.string "role", default: "viewer", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["group_id", "user_id"], name: "index_group_memberships_on_group_id_and_user_id", unique: true
+    t.index ["group_id"], name: "index_group_memberships_on_group_id"
+    t.index ["user_id"], name: "index_group_memberships_on_user_id"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.bigint "owner_id", null: false
+    t.boolean "public", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_groups_on_owner_id"
   end
 
   create_table "highlights", force: :cascade do |t|
@@ -377,23 +442,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_121521) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "annotation_comments", "annotations"
+  add_foreign_key "annotation_comments", "users"
   add_foreign_key "annotation_tags", "annotations"
   add_foreign_key "annotation_tags", "tags"
+  add_foreign_key "annotations", "groups"
   add_foreign_key "annotations", "passages"
   add_foreign_key "annotations", "users"
   add_foreign_key "bookmarks", "passages"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "collection_passages", "collections"
   add_foreign_key "collection_passages", "passages"
+  add_foreign_key "collections", "groups"
   add_foreign_key "collections", "users"
   add_foreign_key "commentaries", "passages"
   add_foreign_key "composition_dates", "scriptures"
   add_foreign_key "corpora", "traditions"
+  add_foreign_key "curricula", "groups"
   add_foreign_key "curricula", "users"
   add_foreign_key "curriculum_items", "curricula"
   add_foreign_key "curriculum_items", "passages"
   add_foreign_key "divisions", "divisions", column: "parent_id"
   add_foreign_key "divisions", "scriptures"
+  add_foreign_key "group_activities", "groups"
+  add_foreign_key "group_activities", "users"
+  add_foreign_key "group_invitations", "groups"
+  add_foreign_key "group_invitations", "users", column: "invited_by_id"
+  add_foreign_key "group_memberships", "groups"
+  add_foreign_key "group_memberships", "users"
+  add_foreign_key "groups", "users", column: "owner_id"
   add_foreign_key "highlights", "passages"
   add_foreign_key "highlights", "translations"
   add_foreign_key "highlights", "users"
