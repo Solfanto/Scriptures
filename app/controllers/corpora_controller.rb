@@ -7,9 +7,11 @@ class CorporaController < ApplicationController
     @scriptures = @corpus.scriptures.includes(:divisions, :composition_dates)
 
     if @sort == "date"
-      @scriptures = @scriptures.left_joins(:composition_dates)
-        .order("composition_dates.earliest_year ASC NULLS LAST, scriptures.position ASC")
-        .distinct
+      @scriptures = @scriptures
+        .left_joins(:composition_dates)
+        .select("scriptures.*, MIN(composition_dates.earliest_year) AS min_year")
+        .group("scriptures.id")
+        .order(Arel.sql("min_year ASC NULLS LAST, scriptures.position ASC"))
     end
   end
 end
