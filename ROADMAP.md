@@ -46,7 +46,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Hadith**
 - [x] Hadith collections (AhmedBaset/hadith-json) — 17 collections imported: 9 major books (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, Malik, Ahmad, Darimi), 3 forty-hadith compilations (Nawawi, Qudsi, Shah Waliullah), 5 supplementary books (Al-Adab Al-Mufrad, Bulugh Al-Maram, Mishkat Al-Masabih, Riyad As-Salihin, Shamail Muhammadiyah) — ~50,884 hadiths, Arabic + English
 - [ ] Sira (biography of the Prophet) — Ibn Ishaq/Ibn Hisham's Sirat Rasul Allah (Guillaume translation on Internet Archive, copyright status unclear)
-- [ ] Tafsir (Quranic exegesis) — Ibn Kathir, Al-Jalalayn, Al-Tabari available via Tafsir API (spa5k/tafsir_api) or alquran-tafsir-json-dataset; import as Commentary records linked to Quran passages
+- [x] Tafsir (Quranic exegesis) — Ibn Kathir (English), Al-Jalalayn (English), Al-Tabari (Arabic) imported as Commentary records linked to Quran passages via spa5k/tafsir_api (27 editions available, 3 imported initially)
 - [ ] Fiqh texts — OpenITI corpus has 776 fiqh texts (255M words), needs format investigation
 
 **Pali Canon**
@@ -55,7 +55,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir
 
 ### 1.3 Import pipeline
 
@@ -178,7 +178,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 - [x] Clearly distinguish critical scholarship from devotional commentary; label each accordingly — type badges
 - [x] Display alongside the passage, collapsible — Commentary tab in study sidebar
 - [x] Link commentary paragraphs to specific passages
-- [ ] Import public domain critical commentaries (ICC, Cambridge Bible, etc.) — model ready, awaiting digitised source data
+- [x] Import public domain critical commentaries — Quranic tafsir imported (Ibn Kathir, Al-Jalalayn, Al-Tabari) via spa5k/tafsir_api; ICC, Cambridge Bible still awaiting digitised source data
 
 ### 5.6 LLM translations
 

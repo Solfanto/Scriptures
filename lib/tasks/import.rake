@@ -118,6 +118,28 @@ namespace :import do
         end
       end
     end
+
+    # spa5k/tafsir_api — Quranic exegesis (tafsir) commentary data
+    # Classical tafsir texts are public domain; dataset is open source
+    tafsir_base = "https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir"
+    %w[en-tafisr-ibn-kathir en-al-jalalayn ar-tafsir-al-tabari].each do |edition|
+      dir = sources_dir.join("tafsir/#{edition}")
+      dir.mkpath
+      (1..114).each do |surah|
+        path = dir.join("#{surah}.json")
+        next if path.exist? && path.size > 100
+
+        print "  fetch tafsir/#{edition}/#{surah}.json..."
+        uri = URI("#{tafsir_base}/#{edition}/#{surah}.json")
+        response = Net::HTTP.get_response(uri)
+        if response.is_a?(Net::HTTPSuccess)
+          File.write(path, response.body)
+          puts " #{path.size} bytes"
+        else
+          puts " FAILED (#{response.code})"
+        end
+      end
+    end
   end
 
   desc "Import a Bible translation from scrollmapper JSON format"
@@ -184,6 +206,13 @@ namespace :import do
     Import::StrongsLexicon.new(file: Rails.root.join(file), language: language).run
   end
 
+  desc "Import tafsir (Quranic exegesis) from spa5k/tafsir_api JSON files"
+  task :tafsir, [ :directory, :edition ] => :environment do |_t, args|
+    directory = args[:directory] || raise("Usage: rake import:tafsir[directory,edition]")
+    edition = args[:edition] || raise("edition required (e.g. en-tafisr-ibn-kathir)")
+    Import::Tafsir.new(directory: Rails.root.join(directory), edition: edition).run
+  end
+
   desc "Import a hadith collection from AhmedBaset/hadith-json by_book JSON format"
   task :hadith, [ :file ] => :environment do |_t, args|
     file = args[:file] || raise("Usage: rake import:hadith[file]")
@@ -216,6 +245,15 @@ namespace :import do
     }.each do |file, (abbr, name, lang)|
       path = sources.join(file)
       Import::QuranTanzil.new(file: path, abbreviation: abbr, name: name, language: lang).run if path.exist?
+    end
+
+    # Tafsir (Quranic exegesis) — must run after Quran import
+    tafsir_dir = sources.join("tafsir")
+    if tafsir_dir.exist?
+      Import::Tafsir::EDITIONS.each_key do |edition|
+        edition_dir = tafsir_dir.join(edition)
+        Import::Tafsir.new(directory: edition_dir, edition: edition).run if edition_dir.exist?
+      end
     end
 
     # SBLGNT Greek New Testament
