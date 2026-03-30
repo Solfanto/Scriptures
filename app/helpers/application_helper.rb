@@ -22,7 +22,7 @@ module ApplicationHelper
         return reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number)
       end
     end
-    session[:last_reading].presence || traditions_path
+    session[:last_reading].presence || root_path
   end
 
   # Lucide-style SVG icons (20x20, stroke-width 2)
