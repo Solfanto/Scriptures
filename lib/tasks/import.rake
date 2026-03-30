@@ -32,7 +32,34 @@ namespace :import do
       "biblical_dss.json" => "https://raw.githubusercontent.com/brando130/BiblicalDSS/main/biblical_dss_unicode.json"
     }
 
-    downloads.each do |filename, url|
+    # AhmedBaset/hadith-json — open source hadith collections
+    # Hadiths are public domain religious texts; dataset is open source
+    hadith_base = "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book"
+    hadith_downloads = {
+      # The nine major books (Kutub al-Sittah + 3)
+      "hadith/bukhari.json" => "#{hadith_base}/the_9_books/bukhari.json",
+      "hadith/muslim.json" => "#{hadith_base}/the_9_books/muslim.json",
+      "hadith/abudawud.json" => "#{hadith_base}/the_9_books/abudawud.json",
+      "hadith/tirmidhi.json" => "#{hadith_base}/the_9_books/tirmidhi.json",
+      "hadith/nasai.json" => "#{hadith_base}/the_9_books/nasai.json",
+      "hadith/ibnmajah.json" => "#{hadith_base}/the_9_books/ibnmajah.json",
+      "hadith/malik.json" => "#{hadith_base}/the_9_books/malik.json",
+      "hadith/ahmed.json" => "#{hadith_base}/the_9_books/ahmed.json",
+      "hadith/darimi.json" => "#{hadith_base}/the_9_books/darimi.json",
+      # Forty hadith collections
+      "hadith/nawawi40.json" => "#{hadith_base}/forties/nawawi40.json",
+      "hadith/qudsi40.json" => "#{hadith_base}/forties/qudsi40.json",
+      "hadith/shahwaliullah40.json" => "#{hadith_base}/forties/shahwaliullah40.json",
+      # Other books
+      "hadith/aladab_almufrad.json" => "#{hadith_base}/other_books/aladab_almufrad.json",
+      "hadith/bulugh_almaram.json" => "#{hadith_base}/other_books/bulugh_almaram.json",
+      "hadith/mishkat_almasabih.json" => "#{hadith_base}/other_books/mishkat_almasabih.json",
+      "hadith/riyad_assalihin.json" => "#{hadith_base}/other_books/riyad_assalihin.json",
+      "hadith/shamail_muhammadiyah.json" => "#{hadith_base}/other_books/shamail_muhammadiyah.json"
+    }
+
+    sources_dir.join("hadith").mkpath
+    downloads.merge(hadith_downloads).each do |filename, url|
       path = sources_dir.join(filename)
       if path.exist? && path.size > 100
         puts "  skip  #{filename} (already exists, #{path.size} bytes)"
@@ -157,6 +184,12 @@ namespace :import do
     Import::StrongsLexicon.new(file: Rails.root.join(file), language: language).run
   end
 
+  desc "Import a hadith collection from AhmedBaset/hadith-json by_book JSON format"
+  task :hadith, [ :file ] => :environment do |_t, args|
+    file = args[:file] || raise("Usage: rake import:hadith[file]")
+    Import::Hadith.new(file: Rails.root.join(file)).run
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke
@@ -203,6 +236,14 @@ namespace :import do
       ).run
     end
 
+    # Hadith collections
+    hadith_dir = sources.join("hadith")
+    if hadith_dir.exist?
+      hadith_dir.glob("*.json").sort.each do |file|
+        Import::Hadith.new(file: file).run
+      end
+    end
+
     # Dead Sea Scrolls
     dss_file = sources.join("biblical_dss.json")
     Import::DeadSeaScrolls.new(file: dss_file).run if dss_file.exist?
@@ -217,11 +258,13 @@ namespace :import do
     classifications = {
       # Original language texts
       "WLC" => "original", "SBLGNT" => "original", "QAR" => "original", "PLI" => "original",
+      "HAR" => "original",
       # Critical/scholarly editions and translations
       "LXX" => "critical", "ASV" => "critical",
       # Devotional translations
       "KJV" => "devotional", "YLT" => "devotional", "DBY" => "devotional",
-      "SAH" => "devotional", "YAL" => "devotional", "PKT" => "devotional", "SUJ" => "devotional"
+      "SAH" => "devotional", "YAL" => "devotional", "PKT" => "devotional", "SUJ" => "devotional",
+      "HEN" => "devotional"
     }
 
     updated = 0

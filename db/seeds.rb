@@ -40,6 +40,13 @@ Corpus.find_or_create_by!(slug: "quran") do |c|
   c.description = "The central religious text of Islam, believed by Muslims to be a revelation from God."
 end
 
+# Corpus: Hadith
+Corpus.find_or_create_by!(slug: "hadith") do |c|
+  c.name = "Hadith"
+  c.tradition = islamic
+  c.description = "The collected sayings, actions, and approvals of the Prophet Muhammad, transmitted through chains of narrators. The six canonical collections (Kutub al-Sittah) plus supplementary compilations."
+end
+
 # Source documents for the Bible (Documentary Hypothesis)
 p_source = SourceDocument.find_or_create_by!(abbreviation: "P", corpus: bible) do |s|
   s.name = "Priestly Source"
