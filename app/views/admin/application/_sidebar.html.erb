@@ -74,6 +74,14 @@
     <!-- Generator: new sidebar links above -->
 
     <div class="sidebar__section">
+      <span class="sidebar__section-title">Data</span>
+    </div>
+
+    <%= link_to admin_imports_path, class: "sidebar__link #{'sidebar__link--active' if controller_name == 'imports'}" do %>
+      <span class="sidebar__text">Imports</span>
+    <% end %>
+
+    <div class="sidebar__section">
       <span class="sidebar__section-title"><%= t("admin.sidebar.system", default: "System") %></span>
     </div>
 

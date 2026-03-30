@@ -97,6 +97,12 @@ Rails.application.routes.draw do
     resources :users
     resources :groups
     resources :annotations
+
+    # Imports
+    get "imports", to: "imports#index", as: :imports
+    post "imports/download", to: "imports#download", as: :imports_download
+    post "imports/run", to: "imports#run", as: :imports_run
+    post "imports/run_all", to: "imports#run_all", as: :imports_run_all
   end
 
   # Canonical passage URLs: /bible/genesis/1

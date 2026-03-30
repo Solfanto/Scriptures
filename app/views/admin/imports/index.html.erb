@@ -1,0 +1,56 @@
+<div class="dashboard">
+  <div class="dashboard__header flex items-center justify-between">
+    <h1 class="dashboard__title">Import Data</h1>
+    <div class="flex items-center gap-3">
+      <%= button_to "Download Sources", admin_imports_download_path, method: :post,
+            class: "px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer" %>
+      <%= button_to "Import All", admin_imports_run_all_path, method: :post,
+            class: "px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors cursor-pointer" %>
+    </div>
+  </div>
+
+  <%= render partial: "admin/application/notice", locals: { notice: } %>
+  <%= render partial: "admin/application/alert", locals: { alert: } %>
+
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+    Source files directory: <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded"><%= @sources_dir %></code>
+  </p>
+
+  <% categories = @importers.group_by { |i| i[:category] } %>
+  <% category_labels = { bible: "Bible & DSS", quran: "Quran & Islamic", islamic: "Islamic", pali: "Pali Canon", lexicon: "Lexicon", maintenance: "Maintenance" } %>
+
+  <div class="space-y-8">
+    <% categories.each do |category, importers| %>
+      <div>
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3"><%= category_labels[category] || category.to_s.titleize %></h2>
+        <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+          <% importers.each do |importer| %>
+            <div class="flex items-center justify-between px-5 py-4">
+              <div class="flex items-center gap-3">
+                <% if importer[:imported] %>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Imported"></span>
+                <% elsif importer[:files_present] %>
+                  <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Source files present, not yet imported"></span>
+                <% else %>
+                  <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" title="Source files missing"></span>
+                <% end %>
+                <div>
+                  <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    <%= importer[:name] %>
+                    <% if importer[:imported] %>
+                      <span class="ml-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Imported</span>
+                    <% end %>
+                  </p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400"><%= importer[:description] %></p>
+                </div>
+              </div>
+              <%= button_to importer[:imported] ? "Re-import" : "Run", admin_imports_run_path(key: importer[:key]), method: :post,
+                    disabled: !importer[:files_present],
+                    class: "px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer #{importer[:files_present] ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'}" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
