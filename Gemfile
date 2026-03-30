@@ -78,6 +78,8 @@ group :development do
   gem "web-console"
   # Open sent emails in the browser instead of sending [https://github.com/ryanb/letter_opener]
   gem "letter_opener"
+  # Annotate models with schema info [https://github.com/drwl/annotaterb]
+  gem "annotaterb"
 end
 
 group :test do

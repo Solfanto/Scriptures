@@ -12,6 +12,19 @@ module ApplicationHelper
     end
   end
 
+  def last_reading_path
+    if current_user
+      last = current_user.reading_progresses.order(read_at: :desc).first
+      if last
+        division = last.passage.division
+        scripture = division.scripture
+        corpus = scripture.corpus
+        return reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number)
+      end
+    end
+    session[:last_reading].presence || traditions_path
+  end
+
   # Lucide-style SVG icons (20x20, stroke-width 2)
   def reading_icon
     svg_icon('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>')

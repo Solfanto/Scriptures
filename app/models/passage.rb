@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: passages
+#
+#  id          :bigint           not null, primary key
+#  number      :integer
+#  position    :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  division_id :bigint           not null
+#
+# Indexes
+#
+#  index_passages_on_division_id             (division_id)
+#  index_passages_on_division_id_and_number  (division_id,number)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (division_id => divisions.id)
+#
 class Passage < ApplicationRecord
   belongs_to :division
   has_many :passage_translations, dependent: :destroy

@@ -1,0 +1,73 @@
+<div class="h-full overflow-y-auto">
+  <%# Hero %>
+  <div class="px-4 md:px-8 py-16 md:py-24 max-w-4xl mx-auto text-center">
+    <h2 class="text-4xl md:text-5xl font-serif mb-4 tracking-tight">Study scripture critically</h2>
+    <p class="text-lg text-stone-500 dark:text-stone-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+      Compare translations side by side, trace source layers, and annotate passages
+      across religious traditions — built for scholars, not devotion.
+    </p>
+    <div class="flex items-center justify-center gap-4">
+      <%= link_to "Browse traditions", traditions_path,
+            class: "px-6 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors" %>
+      <%= link_to "Search texts", search_path,
+            class: "px-6 py-3 border border-stone-200 dark:border-stone-700 rounded-xl text-sm font-medium hover:border-stone-400 dark:hover:border-stone-500 transition-colors" %>
+    </div>
+  </div>
+
+  <%# Stats %>
+  <div class="border-y border-stone-200 dark:border-stone-800 bg-white/50 dark:bg-stone-900/30">
+    <div class="max-w-4xl mx-auto px-4 md:px-8 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-2xl font-bold"><%= @stats[:traditions] %></div>
+        <div class="text-xs text-stone-500 uppercase tracking-widest mt-1">Traditions</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold"><%= @stats[:scriptures] %></div>
+        <div class="text-xs text-stone-500 uppercase tracking-widest mt-1">Scriptures</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold"><%= number_with_delimiter(@stats[:passages]) %></div>
+        <div class="text-xs text-stone-500 uppercase tracking-widest mt-1">Passages</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold"><%= @stats[:translations] %></div>
+        <div class="text-xs text-stone-500 uppercase tracking-widest mt-1">Translations</div>
+      </div>
+    </div>
+  </div>
+
+  <%# Traditions %>
+  <div class="px-4 md:px-8 py-12 md:py-16 max-w-4xl mx-auto">
+    <h3 class="text-2xl font-serif mb-6">Traditions</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% @traditions.each do |tradition| %>
+        <%= link_to tradition_path(tradition), class: "p-6 border border-stone-200 dark:border-stone-800 rounded-2xl hover:border-blue-500 transition-colors group" do %>
+          <h4 class="font-bold text-lg mb-2 group-hover:text-blue-500 transition-colors"><%= tradition.name %></h4>
+          <p class="text-sm text-stone-500 mb-3 line-clamp-2"><%= tradition.description %></p>
+          <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+            <span><%= pluralize(tradition.corpora.size, "corpus", "corpora") %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Features %>
+  <div class="border-t border-stone-200 dark:border-stone-800 px-4 md:px-8 py-12 md:py-16 max-w-4xl mx-auto">
+    <h3 class="text-2xl font-serif mb-6">Tools for critical study</h3>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div>
+        <h4 class="font-bold text-sm mb-1">Parallel translations</h4>
+        <p class="text-sm text-stone-500 leading-relaxed">Read multiple translations side by side — original languages, ancient versions, and modern renderings.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-sm mb-1">Source analysis</h4>
+        <p class="text-sm text-stone-500 leading-relaxed">Color-coded hypothetical source layers (J, E, D, P) overlaid on the text for documentary hypothesis study.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-sm mb-1">Annotations & collections</h4>
+        <p class="text-sm text-stone-500 leading-relaxed">Highlight, annotate, and organize passages into collections. Share notes with study groups.</p>
+      </div>
+    </div>
+  </div>
+</div>

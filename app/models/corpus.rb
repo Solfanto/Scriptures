@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: corpora
+#
+#  id           :bigint           not null, primary key
+#  description  :text
+#  name         :string           not null
+#  slug         :string           not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  tradition_id :bigint           not null
+#
+# Indexes
+#
+#  index_corpora_on_slug          (slug) UNIQUE
+#  index_corpora_on_tradition_id  (tradition_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (tradition_id => traditions.id)
+#
 class Corpus < ApplicationRecord
   self.table_name = "corpora"
 

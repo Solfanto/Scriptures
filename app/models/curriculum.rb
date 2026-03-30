@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: curricula
+#
+#  id              :bigint           not null, primary key
+#  curriculum_type :string
+#  description     :text
+#  name            :string           not null
+#  public          :boolean          default(FALSE), not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  group_id        :bigint
+#  user_id         :bigint           not null
+#
+# Indexes
+#
+#  index_curricula_on_group_id  (group_id)
+#  index_curricula_on_user_id   (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (group_id => groups.id)
+#  fk_rails_...  (user_id => users.id)
+#
 class Curriculum < ApplicationRecord
   self.table_name = "curricula"
 

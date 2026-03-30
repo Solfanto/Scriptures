@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                               :bigint           not null, primary key
+#  admin                            :boolean          default(FALSE), not null
+#  default_corpus_slug              :string
+#  default_translation_abbreviation :string
+#  display_name                     :string
+#  email                            :string           not null
+#  language                         :string           default("en")
+#  password_digest                  :string
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email  (email) UNIQUE
+#
 class User < ApplicationRecord
   has_secure_password validations: false
   has_many :sessions, dependent: :destroy

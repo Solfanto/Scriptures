@@ -34,13 +34,13 @@
       <%# Sidebar %>
       <aside data-sidebar-target="sidebar"
              class="fixed md:relative h-full w-64 border-r border-stone-200 dark:border-stone-800 flex flex-col z-50 bg-white dark:bg-stone-950 -translate-x-full md:translate-x-0 transition-all duration-300 overflow-hidden">
-        <div class="p-6 flex items-center gap-3">
+        <%= link_to root_path, class: "p-6 flex items-center gap-3 no-underline", data: { turbo_action: "advance" } do %>
           <div class="w-8 h-8 bg-stone-900 dark:bg-stone-100 rounded-lg flex items-center justify-center text-white dark:text-stone-900 font-bold shrink-0">S</div>
           <h1 data-sidebar-target="label" class="font-bold text-lg tracking-tight whitespace-nowrap">Scriptures</h1>
-        </div>
+        <% end %>
 
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-          <%= sidebar_link "Reading", reading_icon, root_path, active: current_page?(root_path) || controller_name == "passages" %>
+          <%= sidebar_link "Reading", reading_icon, last_reading_path, active: controller_name == "passages" %>
           <%= sidebar_link "Browse", browse_icon, traditions_path, active: controller_name.in?(%w[traditions corpora scriptures divisions]) %>
           <%= sidebar_link "Search", search_icon, search_path, active: controller_name == "search" %>
           <%= sidebar_link "Discover", discover_icon, discover_path, active: controller_name == "discover" %>

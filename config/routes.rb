@@ -76,12 +76,6 @@ Rails.application.routes.draw do
   get "search", to: "search#index", as: :search
   resource :jump, only: :show
 
-  # Canonical passage URLs: /bible/genesis/1
-  get ":corpus_slug/:scripture_slug/:division_number", to: "passages#show", as: :reading
-
-  # Root: show the default reading view (Genesis 1)
-  root "passages#show"
-
   namespace :admin do
     root "dashboard#index"
     get "countries", to: "countries#index"
@@ -104,4 +98,11 @@ Rails.application.routes.draw do
     resources :groups
     resources :annotations
   end
+
+  # Canonical passage URLs: /bible/genesis/1
+  # Must be after all other routes to avoid catching /admin/* etc.
+  get ":corpus_slug/:scripture_slug/:division_number", to: "passages#show", as: :reading
+
+  # Landing page
+  root "pages#home"
 end

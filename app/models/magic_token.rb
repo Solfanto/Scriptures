@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: magic_tokens
+#
+#  id            :bigint           not null, primary key
+#  browser_token :string           default(""), not null
+#  expires_at    :datetime         not null
+#  short_code    :string           default(""), not null
+#  token         :string           not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  user_id       :bigint           not null
+#
+# Indexes
+#
+#  index_magic_tokens_on_browser_token  (browser_token)
+#  index_magic_tokens_on_short_code     (short_code)
+#  index_magic_tokens_on_token          (token) UNIQUE
+#  index_magic_tokens_on_user_id        (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 class MagicToken < ApplicationRecord
   LIFETIME = 15.minutes
   SHORT_CODE_LENGTH = 6

@@ -42,6 +42,8 @@ class PassagesController < ApplicationController
       @read_passage_ids = Set.new
     end
 
+    session[:last_reading] = reading_path(corpus_slug: @corpus.slug, scripture_slug: @scripture.slug, division_number: @division.number)
+
     @parallel = params[:parallel].present?
 
     if params[:diff].present? && @selected_translations.size >= 2

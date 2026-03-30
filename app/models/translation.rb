@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: translations
+#
+#  id           :bigint           not null, primary key
+#  abbreviation :string
+#  description  :text
+#  edition_type :string
+#  language     :string
+#  name         :string
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  corpus_id    :bigint           not null
+#
+# Indexes
+#
+#  index_translations_on_abbreviation  (abbreviation)
+#  index_translations_on_corpus_id     (corpus_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (corpus_id => corpora.id)
+#
 class Translation < ApplicationRecord
   EDITION_TYPES = %w[critical devotional original].freeze
 

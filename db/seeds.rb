@@ -14,9 +14,44 @@ islamic = Tradition.find_or_create_by!(slug: "islamic") do |t|
   t.description = "The Islamic scriptural tradition including Quran, Hadith, Sira, and Tafsir."
 end
 
-Tradition.find_or_create_by!(slug: "ancient") do |t|
-  t.name = "Ancient & Historical"
-  t.description = "Ancient and historical texts including Egyptian, Mesopotamian, Norse, and Mesoamerican traditions."
+Tradition.find_or_create_by!(slug: "hindu") do |t|
+  t.name = "Hindu"
+  t.description = "The Hindu scriptural tradition including the Vedas, Upanishads, Bhagavad Gita, and epics."
+end
+
+Tradition.find_or_create_by!(slug: "buddhist") do |t|
+  t.name = "Buddhist"
+  t.description = "The Buddhist scriptural tradition including the Pali Canon, Mahayana sutras, and Tibetan texts."
+end
+
+Tradition.find_or_create_by!(slug: "zoroastrian") do |t|
+  t.name = "Zoroastrian"
+  t.description = "The Zoroastrian scriptural tradition including the Avesta and its Gathic hymns."
+end
+
+Tradition.find_or_create_by!(slug: "mesopotamian") do |t|
+  t.name = "Mesopotamian"
+  t.description = "Sumerian, Babylonian, and Assyrian texts including the Epic of Gilgamesh and Enuma Elish."
+end
+
+Tradition.find_or_create_by!(slug: "egyptian") do |t|
+  t.name = "Egyptian"
+  t.description = "Ancient Egyptian religious texts including the Book of the Dead, Pyramid Texts, and Coffin Texts."
+end
+
+Tradition.find_or_create_by!(slug: "greco-roman") do |t|
+  t.name = "Greco-Roman"
+  t.description = "Greek and Roman religious and philosophical texts including the Homeric Hymns, Orphic texts, and mystery cult writings."
+end
+
+Tradition.find_or_create_by!(slug: "norse") do |t|
+  t.name = "Norse"
+  t.description = "Old Norse religious and mythological texts including the Poetic Edda, Prose Edda, and skaldic poetry."
+end
+
+Tradition.find_or_create_by!(slug: "celtic") do |t|
+  t.name = "Celtic"
+  t.description = "Irish and Welsh mythological texts including the Mabinogion, Lebor Gabála Érenn, and the Ulster and Fenian cycles. Medieval compilations of earlier oral traditions."
 end
 
 # Corpus: Bible (shared between Jewish and Christian)
@@ -273,6 +308,13 @@ Scripture.find_by(slug: "mark", corpus: nt)&.tap do |mark|
     d.description = "Widely considered the earliest canonical Gospel, composed during or shortly after the Jewish-Roman War."
     d.citation = "Marcus, J. (2000). Mark 1-8. Anchor Yale Bible Commentary."
   end
+end
+
+# Admin user
+User.find_or_create_by!(email: "admin@myscriptures.app") do |u|
+  u.display_name = "Admin"
+  u.password = "password"
+  u.admin = true
 end
 
 # Parallel passage: not yet seeded as we need passages from multiple corpora loaded via import
