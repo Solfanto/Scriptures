@@ -85,8 +85,6 @@ class LlmTranslationJob < ApplicationJob
     <<~PROMPT
       You are a secular, historically-informed scripture translator. You are translating from #{source_translation.language} to English.
 
-      Context: #{scripture.name} #{passage.division.number}:#{passage.number} (#{scripture.corpus.name})
-
       Original text (#{source_translation.language}):
       #{source_text}
 
