@@ -89,6 +89,17 @@ class RunImportJob < ApplicationJob
       translation_abbreviation: "GUE", translation_name: "Lady Charlotte Guest (1849)",
       progress: cb
     ).run
+    when "mabinogion_welsh" then Import::Celtic.new(
+      file: source("celtic/mabinogion_red_book.txt"),
+      scripture_name: "The Mabinogion",
+      scripture_slug: "mabinogion",
+      scripture_description: "A collection of eleven Welsh prose tales drawn from medieval manuscripts, " \
+                             "the Red Book of Hergest and the White Book of Rhydderch. " \
+                             "Includes the Four Branches, Arthurian romances, and independent tales.",
+      translation_abbreviation: "RHE", translation_name: "Rhŷs & Evans, Red Book of Hergest (1887)",
+      translation_language: "Middle Welsh", edition_type: "original",
+      progress: cb
+    ).run
     when "tain" then Import::Celtic.new(
       file: source("celtic/tain_dunn.txt"),
       scripture_name: "Táin Bó Cúailnge",
@@ -97,6 +108,22 @@ class RunImportJob < ApplicationJob
                              "and the hero Cú Chulainn's single-handed defence of Ulster. " \
                              "Composed in Old and Middle Irish, preserved in the Book of Leinster (12th c.).",
       translation_abbreviation: "DUN", translation_name: "Joseph Dunn (1914)",
+      progress: cb
+    ).run
+    when "tain_irish" then Import::Celtic.new(
+      file: source("celtic/tain_yellow_book.txt"),
+      scripture_name: "Táin Bó Cúailnge",
+      scripture_slug: "tain-bo-cuailnge",
+      scripture_description: "The central epic of the Ulster Cycle, recounting the cattle raid of Cooley " \
+                             "and the hero Cú Chulainn's single-handed defence of Ulster. " \
+                             "Composed in Old and Middle Irish, preserved in the Book of Leinster (12th c.).",
+      translation_abbreviation: "SOK", translation_name: "Strachan & O'Keeffe, Yellow Book of Lecan (1912)",
+      translation_language: "Old Irish", edition_type: "original",
+      progress: cb
+    ).run
+    # Lebor Gabála Érenn — Old/Middle Irish text from Macalister critical edition
+    when "lebor_gabala" then Import::LeborGabala.new(
+      files: (1..5).map { |n| source("celtic/lebor_gabala_#{n}.txt") },
       progress: cb
     ).run
     # Classify translations by edition type (critical, devotional, original)
@@ -151,7 +178,7 @@ class RunImportJob < ApplicationJob
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
       sblgnt suttacentral hadith sira dead_sea_scrolls
       gilgamesh enuma_elish
-      mabinogion tain
+      mabinogion mabinogion_welsh tain tain_irish lebor_gabala
       strongs_hebrew strongs_greek classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)

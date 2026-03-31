@@ -93,11 +93,25 @@ class DownloadSourcesJob < ApplicationJob
     # E.A. Wallis Budge, "The Babylonian Legends of Creation" (1921) — British Museum guide with Enuma Elish translation
     "enuma_elish" => { "mesopotamian/enuma_elish_budge.txt" => "https://archive.org/download/pdfy-MfMlja9m9e6QYsfR/The%20Babylonian%20Legends%20Of%20Creation_djvu.txt" },
 
-    # Celtic texts — public domain translations from Project Gutenberg
-    # Lady Charlotte Guest, "The Mabinogion" (1849) — Welsh mythology, complete single-volume edition
+    # Celtic texts — public domain translations and originals
+    # Lady Charlotte Guest, "The Mabinogion" (1849) — English translation, Project Gutenberg
     "mabinogion" => { "celtic/mabinogion_guest.txt" => "https://www.gutenberg.org/cache/epub/5160/pg5160.txt" },
-    # Joseph Dunn, "The Ancient Irish Epic Tale Táin Bó Cúailnge" (1914) — complete translation from Book of Leinster
-    "tain" => { "celtic/tain_dunn.txt" => "https://www.gutenberg.org/cache/epub/16464/pg16464.txt" }
+    # Rhŷs & Evans, "The Text of the Mabinogion from the Red Book of Hergest" (1887) — Middle Welsh, Internet Archive
+    "mabinogion_welsh" => { "celtic/mabinogion_red_book.txt" => "https://archive.org/download/textofmabinogion00evanuoft/textofmabinogion00evanuoft_djvu.txt" },
+    # Joseph Dunn, "The Ancient Irish Epic Tale Táin Bó Cúailnge" (1914) — English translation, Project Gutenberg
+    "tain" => { "celtic/tain_dunn.txt" => "https://www.gutenberg.org/cache/epub/16464/pg16464.txt" },
+    # Strachan & O'Keeffe, "The Táin Bó Cúailnge from the Yellow Book of Lecan" (1912) — Old Irish, Internet Archive
+    "tain_irish" => { "celtic/tain_yellow_book.txt" => "https://archive.org/download/tinbcailng00strauoft/tinbcailng00strauoft_djvu.txt" },
+
+    # Lebor Gabála Érenn — R.A.S. Macalister critical edition (1938–1956), Irish Texts Society
+    # Original Old/Middle Irish text is public domain (medieval manuscripts); Macalister's editorial
+    # work is EU/Irish public domain since 2021 (life+70). University of Toronto library scans.
+    "lebor_gabala" => {
+      "celtic/lebor_gabala_1.txt" => "https://archive.org/download/leborgablare01macauoft/leborgablare01macauoft_djvu.txt",
+      "celtic/lebor_gabala_3.txt" => "https://archive.org/download/leborgablare03macauoft/leborgablare03macauoft_djvu.txt",
+      "celtic/lebor_gabala_4.txt" => "https://archive.org/download/leborgablare04macauoft/leborgablare04macauoft_djvu.txt",
+      "celtic/lebor_gabala_5.txt" => "https://archive.org/download/leborgablare00macauoft/leborgablare00macauoft_djvu.txt"
+    }
   }.freeze
   # rubocop:enable Layout/LineLength
 

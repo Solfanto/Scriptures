@@ -97,16 +97,33 @@ namespace :import do
     RunImportJob.perform_now("enuma_elish")
   end
 
-  desc "Import The Mabinogion from Guest 1849 Gutenberg text"
+  desc "Import The Mabinogion from Guest 1849 Gutenberg text (English)"
   task :mabinogion, [ :file ] => :environment do |_t, args|
     file = args[:file] || "db/seeds/sources/celtic/mabinogion_guest.txt"
     RunImportJob.perform_now("mabinogion")
   end
 
-  desc "Import Táin Bó Cúailnge from Dunn 1914 Gutenberg text"
+  desc "Import The Mabinogion from Red Book of Hergest (Middle Welsh)"
+  task :mabinogion_welsh, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/celtic/mabinogion_red_book.txt"
+    RunImportJob.perform_now("mabinogion_welsh")
+  end
+
+  desc "Import Táin Bó Cúailnge from Dunn 1914 Gutenberg text (English)"
   task :tain, [ :file ] => :environment do |_t, args|
     file = args[:file] || "db/seeds/sources/celtic/tain_dunn.txt"
     RunImportJob.perform_now("tain")
+  end
+
+  desc "Import Táin Bó Cúailnge from Yellow Book of Lecan (Old Irish)"
+  task :tain_irish, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/celtic/tain_yellow_book.txt"
+    RunImportJob.perform_now("tain_irish")
+  end
+
+  desc "Import Lebor Gabála Érenn (Old Irish text) from Macalister critical edition"
+  task lebor_gabala: :environment do
+    RunImportJob.perform_now("lebor_gabala")
   end
 
   desc "Import all available source data"

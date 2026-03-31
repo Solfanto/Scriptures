@@ -1,15 +1,15 @@
 module Import
   class Celtic
-    # Imports Celtic literary texts from Project Gutenberg plain text.
+    # Imports Celtic literary texts from Project Gutenberg or Internet Archive plain text.
     #
     # Supports section-based prose narratives:
-    #   - The Mabinogion (Lady Charlotte Guest, 1849) — Welsh mythology
-    #   - Táin Bó Cúailnge (Joseph Dunn, 1914) — Irish epic
+    #   - The Mabinogion — Guest English (1849) / Rhŷs & Evans Middle Welsh (1887)
+    #   - Táin Bó Cúailnge — Dunn English (1914) / Strachan & O'Keeffe Old Irish (1912)
     #
     # Mapping:
     #   Tradition "Celtic" → Corpus "Celtic Literature" → Scripture
     #   → Division (one per tale/chapter) → Passage (one per paragraph)
-    #   → PassageTranslation (English)
+    #   → PassageTranslation
 
     GUTENBERG_START = /\*{3}\s*START OF/i
     GUTENBERG_END = /\*{3}\s*END OF/i
@@ -17,11 +17,13 @@ module Import
     # Skip front/back matter sections
     SKIP_HEADINGS = %w[
       INTRODUCTION PREFACE CONTENTS NOTES BIBLIOGRAPHY APPENDIX
-      GLOSSARY INDEX PRONUNCIATION COLOPHON
+      GLOSSARY INDEX PRONUNCIATION COLOPHON CORRIGENDA ERRATA
+      ADDENDA ADVERTISEMENT PRINTED PUBLISHED EDITOR TRANSCRIBER
     ].freeze
 
     def initialize(file:, scripture_name:, scripture_slug:, scripture_description:,
                    translation_abbreviation:, translation_name:,
+                   translation_language: "English", edition_type: "critical",
                    corpus_name: "Celtic Literature", corpus_slug: "celtic-literature",
                    corpus_description: nil, progress: nil)
       @file = Pathname.new(file)
@@ -32,6 +34,8 @@ module Import
       @translation_name = translation_name
       @corpus_name = corpus_name
       @corpus_slug = corpus_slug
+      @translation_language = translation_language
+      @edition_type = edition_type
       @corpus_description = corpus_description
       @progress = progress
     end
@@ -200,8 +204,8 @@ module Import
     def ensure_translation
       Translation.find_or_create_by!(abbreviation: @translation_abbreviation, corpus: @corpus) do |t|
         t.name = @translation_name
-        t.language = "English"
-        t.edition_type = "critical"
+        t.language = @translation_language
+        t.edition_type = @edition_type
       end
     end
   end
