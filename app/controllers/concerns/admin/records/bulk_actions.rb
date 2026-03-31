@@ -49,7 +49,7 @@ module Admin
               end
             end
 
-            render turbo_stream: safe_join(streams)
+            render turbo_stream: helpers.safe_join(streams)
           end
           format.json do
             if errors.any?
@@ -112,7 +112,7 @@ module Admin
               end
             end
 
-            render turbo_stream: safe_join(streams)
+            render turbo_stream: helpers.safe_join(streams)
           end
           format.json do
             if errors.any?
@@ -179,7 +179,7 @@ module Admin
               end
             end
 
-            render turbo_stream: safe_join(streams)
+            render turbo_stream: helpers.safe_join(streams)
           end
           format.json do
             if errors.any?

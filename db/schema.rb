@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_085919) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,9 +25,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
   end
 
   create_table "annotation_tags", force: :cascade do |t|
-    t.bigint "annotation_id", null: false
+    t.integer "annotation_id", null: false
     t.datetime "created_at", null: false
-    t.bigint "tag_id", null: false
+    t.integer "tag_id", null: false
     t.datetime "updated_at", null: false
     t.index ["annotation_id", "tag_id"], name: "index_annotation_tags_on_annotation_id_and_tag_id", unique: true
     t.index ["annotation_id"], name: "index_annotation_tags_on_annotation_id"
@@ -38,10 +38,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.bigint "group_id"
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["group_id"], name: "index_annotations_on_group_id"
     t.index ["passage_id"], name: "index_annotations_on_passage_id"
     t.index ["user_id", "passage_id"], name: "index_annotations_on_user_id_and_passage_id"
@@ -50,18 +50,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "bookmarks", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["passage_id"], name: "index_bookmarks_on_passage_id"
     t.index ["user_id", "passage_id"], name: "index_bookmarks_on_user_id_and_passage_id", unique: true
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
   end
 
   create_table "collection_passages", force: :cascade do |t|
-    t.bigint "collection_id", null: false
+    t.integer "collection_id", null: false
     t.datetime "created_at", null: false
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.integer "position"
     t.datetime "updated_at", null: false
     t.index ["collection_id", "passage_id"], name: "index_collection_passages_on_collection_id_and_passage_id", unique: true
@@ -76,7 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.string "name", null: false
     t.boolean "public", default: false, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["group_id"], name: "index_collections_on_group_id"
     t.index ["user_id"], name: "index_collections_on_user_id"
   end
@@ -86,7 +86,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "body", null: false
     t.string "commentary_type", null: false
     t.datetime "created_at", null: false
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.string "source"
     t.datetime "updated_at", null: false
     t.index ["passage_id", "commentary_type"], name: "index_commentaries_on_passage_id_and_commentary_type"
@@ -100,7 +100,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "description"
     t.integer "earliest_year"
     t.integer "latest_year"
-    t.bigint "scripture_id", null: false
+    t.integer "scripture_id", null: false
     t.datetime "updated_at", null: false
     t.index ["scripture_id"], name: "index_composition_dates_on_scripture_id"
   end
@@ -110,7 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "description"
     t.string "name", null: false
     t.string "slug", null: false
-    t.bigint "tradition_id", null: false
+    t.integer "tradition_id", null: false
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_corpora_on_slug", unique: true
     t.index ["tradition_id"], name: "index_corpora_on_tradition_id"
@@ -146,9 +146,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.datetime "created_at", null: false
     t.string "name"
     t.integer "number"
-    t.bigint "parent_id"
+    t.integer "parent_id"
     t.integer "position"
-    t.bigint "scripture_id", null: false
+    t.integer "scripture_id", null: false
     t.datetime "updated_at", null: false
     t.index ["parent_id"], name: "index_divisions_on_parent_id"
     t.index ["scripture_id", "number"], name: "index_divisions_on_scripture_id_and_number"
@@ -222,11 +222,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.datetime "created_at", null: false
     t.integer "end_offset", null: false
     t.string "label"
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.integer "start_offset", null: false
-    t.bigint "translation_id", null: false
+    t.integer "translation_id", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["passage_id"], name: "index_highlights_on_passage_id"
     t.index ["translation_id"], name: "index_highlights_on_translation_id"
     t.index ["user_id"], name: "index_highlights_on_user_id"
@@ -237,9 +237,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.datetime "created_at", null: false
     t.text "error_message"
     t.string "key", null: false
+    t.integer "processed_count", default: 0
     t.integer "records_count", default: 0
     t.datetime "started_at"
     t.string "status", default: "pending", null: false
+    t.integer "total_count", default: 0
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_import_runs_on_key"
     t.index ["status"], name: "index_import_runs_on_status"
@@ -265,7 +267,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.string "short_code", default: "", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["browser_token"], name: "index_magic_tokens_on_browser_token"
     t.index ["short_code"], name: "index_magic_tokens_on_short_code"
     t.index ["token"], name: "index_magic_tokens_on_token", unique: true
@@ -274,7 +276,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "manuscripts", force: :cascade do |t|
     t.string "abbreviation", null: false
-    t.bigint "corpus_id", null: false
+    t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
     t.string "date_description"
     t.text "description"
@@ -289,9 +291,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
   create_table "original_language_tokens", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "lemma"
-    t.bigint "lexicon_entry_id"
+    t.integer "lexicon_entry_id"
     t.string "morphology"
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.integer "position", null: false
     t.string "text", null: false
     t.string "transliteration"
@@ -306,11 +308,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "citation"
     t.datetime "created_at", null: false
     t.text "description"
-    t.bigint "parallel_passage_id", null: false
-    t.bigint "passage_id", null: false
+    t.integer "parallel_passage_id", null: false
+    t.integer "passage_id", null: false
     t.string "relationship_type", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.integer "user_id"
     t.index ["parallel_passage_id"], name: "index_parallel_passages_on_parallel_passage_id"
     t.index ["passage_id", "parallel_passage_id"], name: "index_parallel_passages_on_passage_id_and_parallel_passage_id", unique: true
     t.index ["passage_id"], name: "index_parallel_passages_on_passage_id"
@@ -319,8 +321,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "passage_source_documents", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "passage_id", null: false
-    t.bigint "source_document_id", null: false
+    t.integer "passage_id", null: false
+    t.integer "source_document_id", null: false
     t.datetime "updated_at", null: false
     t.index ["passage_id"], name: "index_passage_source_documents_on_passage_id"
     t.index ["source_document_id"], name: "index_passage_source_documents_on_source_document_id"
@@ -328,10 +330,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "passage_translations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.tsvector "search_vector"
     t.text "text", null: false
-    t.bigint "translation_id", null: false
+    t.integer "translation_id", null: false
     t.datetime "updated_at", null: false
     t.index ["passage_id", "translation_id"], name: "index_passage_translations_on_passage_id_and_translation_id", unique: true
     t.index ["passage_id"], name: "index_passage_translations_on_passage_id"
@@ -341,7 +343,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "passages", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "division_id", null: false
+    t.integer "division_id", null: false
     t.integer "number"
     t.integer "position"
     t.datetime "updated_at", null: false
@@ -356,17 +358,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.text "public_key", null: false
     t.integer "sign_count", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["external_id"], name: "index_passkey_credentials_on_external_id", unique: true
     t.index ["user_id"], name: "index_passkey_credentials_on_user_id"
   end
 
   create_table "ratings", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "passage_translation_id", null: false
+    t.integer "passage_translation_id", null: false
     t.integer "score", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["passage_translation_id"], name: "index_ratings_on_passage_translation_id"
     t.index ["user_id", "passage_translation_id"], name: "index_ratings_on_user_id_and_passage_translation_id", unique: true
     t.index ["user_id"], name: "index_ratings_on_user_id"
@@ -385,7 +387,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
   end
 
   create_table "scriptures", force: :cascade do |t|
-    t.bigint "corpus_id", null: false
+    t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name", null: false
@@ -401,7 +403,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -409,7 +411,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.string "abbreviation"
     t.string "bibliography_url"
     t.string "color"
-    t.bigint "corpus_id", null: false
+    t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name"
@@ -422,16 +424,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.index ["user_id", "name"], name: "index_tags_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_tags_on_user_id"
   end
 
   create_table "textual_variants", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "manuscript_id", null: false
+    t.integer "manuscript_id", null: false
     t.text "notes"
-    t.bigint "passage_id", null: false
+    t.integer "passage_id", null: false
     t.text "text", null: false
     t.datetime "updated_at", null: false
     t.index ["manuscript_id"], name: "index_textual_variants_on_manuscript_id"
@@ -450,7 +452,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_220024) do
 
   create_table "translations", force: :cascade do |t|
     t.string "abbreviation"
-    t.bigint "corpus_id", null: false
+    t.integer "corpus_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.string "edition_type"
