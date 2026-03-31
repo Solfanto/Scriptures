@@ -97,6 +97,18 @@ namespace :import do
     RunImportJob.perform_now("enuma_elish")
   end
 
+  desc "Import The Mabinogion from Guest 1849 Gutenberg text"
+  task :mabinogion, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/celtic/mabinogion_guest.txt"
+    RunImportJob.perform_now("mabinogion")
+  end
+
+  desc "Import Táin Bó Cúailnge from Dunn 1914 Gutenberg text"
+  task :tain, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/celtic/tain_dunn.txt"
+    RunImportJob.perform_now("tain")
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke

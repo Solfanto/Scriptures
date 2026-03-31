@@ -91,7 +91,13 @@ class DownloadSourcesJob < ApplicationJob
     # R. Campbell Thompson, "The Epic of Gilgamish" (1928) — literal English hexameter translation
     "gilgamesh" => { "mesopotamian/gilgamesh_thompson.txt" => "https://archive.org/download/thompson-1928-gilgamesh/Thompson_1928_Gilgamesh_djvu.txt" },
     # E.A. Wallis Budge, "The Babylonian Legends of Creation" (1921) — British Museum guide with Enuma Elish translation
-    "enuma_elish" => { "mesopotamian/enuma_elish_budge.txt" => "https://archive.org/download/pdfy-MfMlja9m9e6QYsfR/The%20Babylonian%20Legends%20Of%20Creation_djvu.txt" }
+    "enuma_elish" => { "mesopotamian/enuma_elish_budge.txt" => "https://archive.org/download/pdfy-MfMlja9m9e6QYsfR/The%20Babylonian%20Legends%20Of%20Creation_djvu.txt" },
+
+    # Celtic texts — public domain translations from Project Gutenberg
+    # Lady Charlotte Guest, "The Mabinogion" (1849) — Welsh mythology, complete single-volume edition
+    "mabinogion" => { "celtic/mabinogion_guest.txt" => "https://www.gutenberg.org/cache/epub/5160/pg5160.txt" },
+    # Joseph Dunn, "The Ancient Irish Epic Tale Táin Bó Cúailnge" (1914) — complete translation from Book of Leinster
+    "tain" => { "celtic/tain_dunn.txt" => "https://www.gutenberg.org/cache/epub/16464/pg16464.txt" }
   }.freeze
   # rubocop:enable Layout/LineLength
 

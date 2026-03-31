@@ -82,14 +82,14 @@ Prioritise critical editions and scholarly sources over devotional translations:
 - [ ] Prose Edda (Snorri Sturluson) — Arthur Gilchrist Brodeur translation (1916) is public domain; Old Norse via heimskringla.no
 
 **Celtic**
-- [ ] Mabinogion — Lady Charlotte Guest translation (1849) is public domain; Welsh text from Rhyddiaith Gymraeg corpus
-- [ ] Lebor Gabála Érenn — R.A.S. Macalister translation (1938–1956); Old Irish texts via CELT (Corpus of Electronic Texts, University College Cork)
-- [ ] Ulster Cycle / Fenian Cycle — CELT has Old and Middle Irish texts with translations
+- [x] Mabinogion — Lady Charlotte Guest translation (1849), Project Gutenberg plain text (public domain)
+- [ ] Lebor Gabála Érenn — R.A.S. Macalister translation (1938–1956); not yet public domain in US (earliest volume enters PD in 2034)
+- [x] Táin Bó Cúailnge — Joseph Dunn translation (1914), Project Gutenberg plain text (public domain)
 
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian, celtic
 
 ### 1.3 Import pipeline
 
