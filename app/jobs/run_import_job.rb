@@ -126,6 +126,59 @@ class RunImportJob < ApplicationJob
       files: (1..5).map { |n| source("celtic/lebor_gabala_#{n}.txt") },
       progress: cb
     ).run
+    # Norse texts — Poetic Edda and Prose Edda
+    when "poetic_edda" then Import::Norse.new(
+      file: source("norse/poetic_edda_bellows.txt"),
+      format: :poetic,
+      scripture_name: "Poetic Edda",
+      scripture_slug: "poetic-edda",
+      scripture_description: "A collection of Old Norse poems from the medieval Codex Regius manuscript (c. 1270). " \
+                             "Contains mythological lays about the Norse gods and heroic lays about legendary figures. " \
+                             "The primary source for Norse mythology and cosmology.",
+      translation_abbreviation: "BEL",
+      translation_name: "Henry Adams Bellows (1923)",
+      progress: cb
+    ).run
+    when "poetic_edda_old_norse" then Import::Norse.new(
+      directory: source("norse/poetic_edda_old_norse"),
+      format: :poetic,
+      scripture_name: "Poetic Edda",
+      scripture_slug: "poetic-edda",
+      scripture_description: "A collection of Old Norse poems from the medieval Codex Regius manuscript (c. 1270). " \
+                             "Contains mythological lays about the Norse gods and heroic lays about legendary figures. " \
+                             "The primary source for Norse mythology and cosmology.",
+      translation_abbreviation: "GJE",
+      translation_name: "Guðni Jónsson Edition (Old Norse)",
+      translation_language: "Old Norse",
+      edition_type: "original",
+      progress: cb
+    ).run
+    when "prose_edda" then Import::Norse.new(
+      file: source("norse/prose_edda_brodeur.txt"),
+      format: :prose,
+      scripture_name: "Prose Edda",
+      scripture_slug: "prose-edda",
+      scripture_description: "Written by Snorri Sturluson c. 1220, a manual of poetics that preserves " \
+                             "Norse mythological narratives. Contains the Gylfaginning (cosmogony and mythology), " \
+                             "Skáldskaparmál (poetic diction), and Háttatal (verse forms).",
+      translation_abbreviation: "BRO",
+      translation_name: "Arthur Gilchrist Brodeur (1916)",
+      progress: cb
+    ).run
+    when "prose_edda_old_norse" then Import::Norse.new(
+      directory: source("norse/prose_edda_old_norse"),
+      format: :prose,
+      scripture_name: "Prose Edda",
+      scripture_slug: "prose-edda",
+      scripture_description: "Written by Snorri Sturluson c. 1220, a manual of poetics that preserves " \
+                             "Norse mythological narratives. Contains the Gylfaginning (cosmogony and mythology), " \
+                             "Skáldskaparmál (poetic diction), and Háttatal (verse forms).",
+      translation_abbreviation: "GJS",
+      translation_name: "Guðni Jónsson Edition (Old Norse)",
+      translation_language: "Old Norse",
+      edition_type: "original",
+      progress: cb
+    ).run
     # Classify translations by edition type (critical, devotional, original)
     when "classify_translations" then classify_translations
     else raise ArgumentError, "Unknown importer: #{key}"
@@ -179,6 +232,7 @@ class RunImportJob < ApplicationJob
       sblgnt suttacentral hadith sira dead_sea_scrolls
       gilgamesh enuma_elish
       mabinogion mabinogion_welsh tain tain_irish lebor_gabala
+      poetic_edda_old_norse poetic_edda prose_edda_old_norse prose_edda
       strongs_hebrew strongs_greek classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)

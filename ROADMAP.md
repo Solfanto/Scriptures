@@ -78,8 +78,8 @@ Prioritise critical editions and scholarly sources over devotional translations:
 - [ ] Hesiod (Theogony, Works and Days) — Perseus Digital Library; Hugh G. Evelyn-White translation (1914) is public domain
 
 **Norse**
-- [ ] Poetic Edda — Völuspá, Hávamál, etc.; Henry Adams Bellows translation (1923) is public domain; Old Norse texts available via heimskringla.no
-- [ ] Prose Edda (Snorri Sturluson) — Arthur Gilchrist Brodeur translation (1916) is public domain; Old Norse via heimskringla.no
+- [x] Poetic Edda — Völuspá, Hávamál, etc.; Henry Adams Bellows translation (1923) is public domain; Old Norse texts (25 poems) from CLTK/heimskringla.no (Guðni Jónsson edition)
+- [x] Prose Edda (Snorri Sturluson) — Arthur Gilchrist Brodeur translation (1916) from Internet Archive DjVu; Old Norse (4 sections) from CLTK/heimskringla.no
 
 **Celtic**
 - [x] Mabinogion — Lady Charlotte Guest English translation (1849), Project Gutenberg; Rhŷs & Evans Middle Welsh from Red Book of Hergest (1887), Internet Archive
@@ -89,7 +89,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian, celtic
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian, celtic, norse
 
 ### 1.3 Import pipeline
 

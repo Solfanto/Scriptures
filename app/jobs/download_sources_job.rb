@@ -10,6 +10,7 @@ class DownloadSourcesJob < ApplicationJob
   DHP_FILES = %w[dhp1-20 dhp21-32 dhp33-43 dhp44-59 dhp60-75 dhp76-89 dhp90-99 dhp100-115 dhp116-128 dhp129-145 dhp146-156 dhp157-166 dhp167-178 dhp179-196 dhp197-208 dhp209-220 dhp221-234 dhp235-255 dhp256-272 dhp273-289 dhp290-305 dhp306-319 dhp320-333 dhp334-359 dhp360-382 dhp383-423].freeze
   TAFSIR_EDITIONS = %w[en-tafisr-ibn-kathir en-al-jalalayn ar-tafsir-al-tabari].freeze
   TAFSIR_BASE = "https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir"
+  CLTK_EDDA_BASE = "https://raw.githubusercontent.com/cltk/old_norse_texts_heimskringla/master"
 
   # Per-importer download registry: importer_key => { filename => url }
   # rubocop:disable Layout/LineLength
@@ -111,6 +112,51 @@ class DownloadSourcesJob < ApplicationJob
       "celtic/lebor_gabala_3.txt" => "https://archive.org/download/leborgablare03macauoft/leborgablare03macauoft_djvu.txt",
       "celtic/lebor_gabala_4.txt" => "https://archive.org/download/leborgablare04macauoft/leborgablare04macauoft_djvu.txt",
       "celtic/lebor_gabala_5.txt" => "https://archive.org/download/leborgablare00macauoft/leborgablare00macauoft_djvu.txt"
+    },
+
+    # Norse texts — Poetic Edda and Prose Edda
+
+    # Henry Adams Bellows, "The Poetic Edda" (1923) — English translation, Project Gutenberg
+    "poetic_edda" => { "norse/poetic_edda_bellows.txt" => "https://www.gutenberg.org/cache/epub/73533/pg73533.txt" },
+
+    # Poetic Edda in Old Norse — Guðni Jónsson edition via CLTK/heimskringla.no (public domain medieval texts)
+    "poetic_edda_old_norse" => {
+      "norse/poetic_edda_old_norse/voluspa.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/V%C3%B6lusp%C3%A1/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/havamal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/H%C3%A1vam%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/vafthrudnismal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Vaf%C3%BEr%C3%BA%C3%B0nism%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/grimnismal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Gr%C3%ADmnism%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/skirnismal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Sk%C3%ADrnism%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/harbardsljod.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/H%C3%A1rbar%C3%B0slj%C3%B3%C3%B0/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/hymiskvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Hymiskvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/lokasenna.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Lokasenna/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/thrymskvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/%C3%9Erymskvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/volundarkvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/V%C3%B6lundarkvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/alvissmal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Alv%C3%ADssm%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/baldrs_draumar.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Baldrs%20draumar/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/rigsthula.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/R%C3%ADgs%C3%BEula/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/hyndluljod.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Hyndlulj%C3%B3%C3%B0/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/grottasongr.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Gr%C3%B3ttas%C3%B6ngr/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/fafnismal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/F%C3%A1fnism%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/sigrdrifumal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Sigrdr%C3%ADfum%C3%A1l/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/gudrunarkvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Gu%C3%B0r%C3%BAnarkvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/helreid_brynhildar.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Helrei%C3%B0%20Brynhildar/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/drap_niflunga.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Dr%C3%A1p%20Niflunga/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/oddrunarkvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Oddr%C3%BAnarkvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/atlakvida.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Atlakvi%C3%B0a/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/atlamal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Ataml%C3%A1l%20in%20gr%C3%A6nlenzku/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/gudrunarhvot.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Gu%C3%B0r%C3%BAnarhv%C3%B6t/txt_files/complete.txt",
+      "norse/poetic_edda_old_norse/hamthismal.txt" => "#{CLTK_EDDA_BASE}/S%C3%A6mundar-Edda/Ham%C3%B0ism%C3%A1l/txt_files/complete.txt"
+    },
+
+    # Arthur Gilchrist Brodeur, "The Prose Edda" (1916) — English translation, Internet Archive DjVu
+    "prose_edda" => { "norse/prose_edda_brodeur.txt" => "https://archive.org/download/proseedda00snor/proseedda00snor_djvu.txt" },
+
+    # Prose Edda in Old Norse — Guðni Jónsson edition via CLTK/heimskringla.no (public domain medieval text)
+    "prose_edda_old_norse" => {
+      "norse/prose_edda_old_norse/prologus.txt" => "#{CLTK_EDDA_BASE}/Snorra-Edda/txt_files/prologus.txt",
+      "norse/prose_edda_old_norse/gylfaginning.txt" => "#{CLTK_EDDA_BASE}/Snorra-Edda/txt_files/gylfaginning.txt",
+      "norse/prose_edda_old_norse/skaaldskaparmaal.txt" => "#{CLTK_EDDA_BASE}/Snorra-Edda/txt_files/skaaldskaparmaal.txt",
+      "norse/prose_edda_old_norse/haattatal.txt" => "#{CLTK_EDDA_BASE}/Snorra-Edda/txt_files/haattatal.txtl"
     }
   }.freeze
   # rubocop:enable Layout/LineLength

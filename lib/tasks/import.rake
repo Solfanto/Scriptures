@@ -126,6 +126,26 @@ namespace :import do
     RunImportJob.perform_now("lebor_gabala")
   end
 
+  desc "Import Poetic Edda from Bellows 1923 Gutenberg text (English)"
+  task poetic_edda: :environment do
+    RunImportJob.perform_now("poetic_edda")
+  end
+
+  desc "Import Poetic Edda in Old Norse from CLTK/heimskringla.no"
+  task poetic_edda_old_norse: :environment do
+    RunImportJob.perform_now("poetic_edda_old_norse")
+  end
+
+  desc "Import Prose Edda from Brodeur 1916 DjVu text (English)"
+  task prose_edda: :environment do
+    RunImportJob.perform_now("prose_edda")
+  end
+
+  desc "Import Prose Edda in Old Norse from CLTK/heimskringla.no"
+  task prose_edda_old_norse: :environment do
+    RunImportJob.perform_now("prose_edda_old_norse")
+  end
+
   desc "Import all available source data"
   task all: :environment do
     Rake::Task["import:download"].invoke
