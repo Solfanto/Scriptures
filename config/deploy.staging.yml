@@ -43,6 +43,8 @@ env:
     POSTGRES_DB: scriptures_staging
     SMTP_FROM_ADDRESS: "no-reply@staging.solfanto.org"
     SMTP_FROM_NAME: "[Staging] Scriptures"
+    WEBAUTHN_ORIGIN: "https://scriptures-staging.solfanto.org"
+    WEBAUTHN_RP_ID: scriptures-staging.solfanto.org
     SOLID_QUEUE_IN_PUMA: true
 
 # Use accessory services (secrets come from .kamal/secrets).
