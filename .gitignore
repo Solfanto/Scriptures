@@ -32,6 +32,7 @@
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
+/config/credentials/*.key
 
 /.mockups
 
@@ -41,3 +42,7 @@
 # Source data files (large, downloaded on demand via rake import:download)
 /db/seeds/sources/*
 !/db/seeds/sources/.keep
+
+# Ignore key files for decrypting credentials and more.
+/config/credentials/*.key
+

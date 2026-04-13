@@ -1,0 +1,4 @@
+CREATE DATABASE scriptures_staging;
+CREATE DATABASE scriptures_staging_cache;
+CREATE DATABASE scriptures_staging_queue;
+CREATE DATABASE scriptures_staging_cable;

@@ -17,26 +17,41 @@ test:
   database: scriptures_test
 
 production:
-  primary:
+  primary: &primary_production
     <<: *default
-    database: scriptures_production
-    username: scriptures
-    password: <%= ENV["SCRIPTURES_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_production") %>
+    username: <%= ENV["POSTGRES_USER"] %>
+    password: <%= ENV["POSTGRES_PASSWORD"] %>
   cache:
-    <<: *default
-    database: scriptures_production_cache
-    username: scriptures
-    password: <%= ENV["SCRIPTURES_DATABASE_PASSWORD"] %>
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_production") %>_cache
     migrations_paths: db/cache_migrate
   queue:
-    <<: *default
-    database: scriptures_production_queue
-    username: scriptures
-    password: <%= ENV["SCRIPTURES_DATABASE_PASSWORD"] %>
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_production") %>_queue
     migrations_paths: db/queue_migrate
   cable:
+    <<: *primary_production
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_production") %>_cable
+    migrations_paths: db/cable_migrate
+
+staging:
+  primary: &primary_staging
     <<: *default
-    database: scriptures_production_cable
-    username: scriptures
-    password: <%= ENV["SCRIPTURES_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_staging") %>
+    username: <%= ENV["POSTGRES_USER"] %>
+    password: <%= ENV["POSTGRES_PASSWORD"] %>
+  cache:
+    <<: *primary_staging
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_staging") %>_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_staging
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_staging") %>_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_staging
+    database: <%= ENV.fetch("POSTGRES_DB", "scriptures_staging") %>_cable
     migrations_paths: db/cable_migrate
