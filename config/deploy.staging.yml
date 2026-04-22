@@ -39,7 +39,7 @@ env:
   clear:
     RAILS_ENV: staging
     HOST: scriptures-staging.solfanto.org
-    DB_HOST: scriptures-staging-db
+    DB_HOST: 172.17.0.1
     POSTGRES_DB: scriptures_staging
     SMTP_FROM_ADDRESS: "no-reply@staging.solfanto.org"
     SMTP_FROM_NAME: "[Staging] Scriptures"
@@ -48,19 +48,19 @@ env:
     SOLID_QUEUE_IN_PUMA: true
 
 # Use accessory services (secrets come from .kamal/secrets).
-accessories:
-  db:
-    image: postgres:17
-    host: staging2.solfanto.org
-    port: 127.0.0.1:5444:5432 # Change this for multiple Postgres containers in the same machine
-    env:
-      clear:
-        POSTGRES_DB: scriptures_staging
-        POSTGRES_HOST_AUTH_METHOD: trust
-      secret:
-        - POSTGRES_USER
-        - POSTGRES_PASSWORD
-    files:
-      - config/init.staging.sql:/docker-entrypoint-initdb.d/setup.sql
-    directories:
-      - data:/var/lib/postgresql/data
+# accessories:
+#   db:
+#     image: postgres:17
+#     host: staging2.solfanto.org
+#     port: 127.0.0.1:5444:5432 # Change this for multiple Postgres containers in the same machine
+#     env:
+#       clear:
+#         POSTGRES_DB: scriptures_staging
+#         POSTGRES_HOST_AUTH_METHOD: trust
+#       secret:
+#         - POSTGRES_USER
+#         - POSTGRES_PASSWORD
+#     files:
+#       - config/init.staging.sql:/docker-entrypoint-initdb.d/setup.sql
+#     directories:
+#       - data:/var/lib/postgresql/data

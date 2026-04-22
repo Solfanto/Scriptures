@@ -95,8 +95,8 @@ builder:
 ssh:
   user: ubuntu
 
-# Increase the deploy timeout to 60 seconds.
-deploy_timeout: 60
+# Increase the deploy timeout to 120 seconds.
+deploy_timeout: 120
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:

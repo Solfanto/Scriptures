@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+#
+# Ensures the staging postgres role and database exist before deploy.
+#
+# Host postgres (not a Kamal accessory) is used on staging, so the app's
+# POSTGRES_USER / POSTGRES_DB have to be provisioned out of band. This hook
+# does that idempotently on every `bin/kamal deploy -d staging`, using the
+# POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB that Kamal already loads
+# from .kamal/secrets.staging + config/deploy.staging.yml.
+#
+# Prerequisites on the staging host (staging2.solfanto.org):
+#   - postgres is installed and running
+#   - the SSH user (ubuntu) has passwordless `sudo -u postgres psql`
+#     (e.g. a sudoers line: `ubuntu ALL=(postgres) NOPASSWD: /usr/bin/psql`)
+#
+# Env provided by Kamal:
+#   KAMAL_DESTINATION, KAMAL_COMMAND, KAMAL_HOSTS
+#   POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB  (from env.secret/env.clear)
+
+set -euo pipefail
+
+# Only provision for the staging destination, and never on rollback.
+if [[ "${KAMAL_DESTINATION:-}" != "staging" ]]; then
+  exit 0
+fi
+if [[ "${KAMAL_COMMAND:-}" == "rollback" ]]; then
+  exit 0
+fi
+
+: "${POSTGRES_USER:?POSTGRES_USER not in env — check .kamal/secrets.staging}"
+: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not in env — check .kamal/secrets.staging}"
+: "${POSTGRES_DB:=scriptures_staging}"
+: "${KAMAL_HOSTS:?KAMAL_HOSTS not set by Kamal}"
+
+# Guard against SQL identifier injection. Role and db names are our own
+# config values, so a strict identifier check is fine here.
+if [[ ! "$POSTGRES_USER" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+  echo "pre-deploy: POSTGRES_USER must be a plain SQL identifier, got: $POSTGRES_USER" >&2
+  exit 1
+fi
+# Rails 8 multi-db: primary + Solid Cache / Queue / Cable each need their own
+# database (see config/database.yml). Suffixes must stay in sync with that file.
+DB_NAMES=(
+  "$POSTGRES_DB"
+  "${POSTGRES_DB}_cache"
+  "${POSTGRES_DB}_queue"
+  "${POSTGRES_DB}_cable"
+)
+for db in "${DB_NAMES[@]}"; do
+  if [[ ! "$db" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    echo "pre-deploy: database name must be a plain SQL identifier, got: $db" >&2
+    exit 1
+  fi
+done
+
+# Dollar-quote the password so we don't have to escape quotes/backslashes.
+# A random tag makes collision with the password content effectively impossible.
+if command -v openssl >/dev/null 2>&1; then
+  TAG="pw_$(openssl rand -hex 8)"
+else
+  TAG="pw_$(date +%s)_$RANDOM"
+fi
+if [[ "$POSTGRES_PASSWORD" == *"\$${TAG}\$"* ]]; then
+  echo "pre-deploy: password collides with generated tag, retry the deploy" >&2
+  exit 1
+fi
+
+HOST="${KAMAL_HOSTS%%,*}"
+SSH_USER="ubuntu"
+
+DB_SQL=""
+for db in "${DB_NAMES[@]}"; do
+  DB_SQL+="
+SELECT 'CREATE DATABASE \"${db}\" OWNER \"${POSTGRES_USER}\"'
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '${db}')\gexec
+GRANT ALL PRIVILEGES ON DATABASE \"${db}\" TO \"${POSTGRES_USER}\";
+"
+done
+
+echo "==> pre-deploy: ensuring role \"$POSTGRES_USER\" and dbs [${DB_NAMES[*]}] on $HOST"
+
+ssh -T "${SSH_USER}@${HOST}" 'sudo -u postgres psql -v ON_ERROR_STOP=1 -q' <<SQL
+DO \$do\$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${POSTGRES_USER}') THEN
+    ALTER ROLE "${POSTGRES_USER}" WITH LOGIN PASSWORD \$${TAG}\$${POSTGRES_PASSWORD}\$${TAG}\$;
+  ELSE
+    CREATE ROLE "${POSTGRES_USER}" WITH LOGIN PASSWORD \$${TAG}\$${POSTGRES_PASSWORD}\$${TAG}\$;
+  END IF;
+END
+\$do\$;
+${DB_SQL}
+SQL
+
+echo "==> pre-deploy: postgres provisioning OK"
