@@ -54,6 +54,23 @@ class RunImportJob < ApplicationJob
     when "dead_sea_scrolls" then Import::DeadSeaScrolls.new(file: source("biblical_dss.json"), progress: cb).run
     # Sira (prophetic biography) from Internet Archive DjVu text
     when "sira" then Import::Sira.new(file: source("sira/sirat_ibn_hisham.txt"), progress: cb).run
+    # Ibn Kathir's Al-Sira al-Nabawiyya — public domain Arabic original
+    when "ibn_kathir_sira" then Import::IbnKathirSira.new(file: source("sira/ibn_kathir_sira.txt"), progress: cb).run
+    # Fiqh — al-Shafi'i's al-Risala from OpenITI mARkdown
+    when "fiqh_risala" then Import::Fiqh.new(
+      file: source("fiqh/risala_shafici.txt"),
+      scripture_name: "Al-Risala (al-Shafi'i)",
+      scripture_slug: "al-risala-shafici",
+      scripture_description: "The foundational treatise on usul al-fiqh (Islamic legal theory) " \
+                             "by Muhammad ibn Idris al-Shafi'i (d. 820 CE), eponym of the " \
+                             "Shafi'i school. Establishes the four sources of law: Qur'an, " \
+                             "Sunnah, ijma', and qiyas. Source: OpenITI corpus.",
+      translation_abbreviation: "RSA",
+      translation_name: "Al-Risala (Arabic, OpenITI)",
+      progress: cb
+    ).run
+    # Manuscript witnesses — Codex Sinaiticus, Vaticanus, San'a 1 lower & upper
+    when "manuscripts" then Import::Manuscripts.new(progress: cb).run
     # Strong's lexicon from OpenScriptures JS format
     when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew", progress: cb).run
     when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek", progress: cb).run
@@ -229,11 +246,11 @@ class RunImportJob < ApplicationJob
     %w[
       bible_kjv bible_asv bible_ylt bible_darby
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
-      sblgnt suttacentral hadith sira dead_sea_scrolls
+      sblgnt suttacentral hadith sira ibn_kathir_sira fiqh_risala dead_sea_scrolls
       gilgamesh enuma_elish
       mabinogion mabinogion_welsh tain tain_irish lebor_gabala
       poetic_edda_old_norse poetic_edda prose_edda_old_norse prose_edda
-      strongs_hebrew strongs_greek classify_translations
+      strongs_hebrew strongs_greek manuscripts classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)
       perform(sub_key, import_run: sub_run)

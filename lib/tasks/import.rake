@@ -85,6 +85,23 @@ namespace :import do
     Import::Sira.new(file: Rails.root.join(file)).run
   end
 
+  desc "Import Ibn Kathir's Al-Sira al-Nabawiyya (Arabic, public domain)"
+  task :ibn_kathir_sira, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/sira/ibn_kathir_sira.txt"
+    RunImportJob.perform_now("ibn_kathir_sira")
+  end
+
+  desc "Import al-Shafi'i's al-Risala (foundational fiqh text) from OpenITI mARkdown"
+  task :fiqh_risala, [ :file ] => :environment do |_t, args|
+    file = args[:file] || "db/seeds/sources/fiqh/risala_shafici.txt"
+    RunImportJob.perform_now("fiqh_risala")
+  end
+
+  desc "Seed manuscript witnesses (Codex Sinaiticus, Vaticanus, San'a 1) and curated variants"
+  task manuscripts: :environment do
+    RunImportJob.perform_now("manuscripts")
+  end
+
   desc "Import Epic of Gilgamesh from Thompson 1928 DjVu text"
   task :gilgamesh, [ :file ] => :environment do |_t, args|
     file = args[:file] || "db/seeds/sources/mesopotamian/gilgamesh_thompson.txt"

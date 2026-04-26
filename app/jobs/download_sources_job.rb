@@ -79,6 +79,18 @@ class DownloadSourcesJob < ApplicationJob
       "sira/sirat_ibn_hisham.txt" => "https://archive.org/download/SiratIbnHishamBiographyOfTheProphet/Sirat%20Ibn%20Hisham%20-%20Biography%20of%20the%20Prophet_djvu.txt"
     },
 
+    # Ibn Kathir's Al-Sira al-Nabawiyya (14th c. Arabic) — public domain Arabic original.
+    # Le Gassick's English translation (1998–2000) is under copyright and excluded.
+    "ibn_kathir_sira" => {
+      "sira/ibn_kathir_sira.txt" => "https://archive.org/download/sirat-ibn-kathir-arabic/sirat-ibn-kathir-arabic_djvu.txt"
+    },
+
+    # Fiqh — al-Shafi'i's al-Risala (c. 820 CE), foundational text of usul al-fiqh.
+    # Source: OpenITI corpus mARkdown edition (Shamela 0010719).
+    "fiqh_risala" => {
+      "fiqh/risala_shafici.txt" => "https://raw.githubusercontent.com/OpenITI/0200AH/master/data/0204Shafici/0204Shafici.Risala/0204Shafici.Risala.Shamela0010719-ara1.completed"
+    },
+
     # brando130/BiblicalDSS — CC BY-NC 4.0 (non-commercial, attribution required)
     "dead_sea_scrolls" => {
       "biblical_dss.json" => "https://raw.githubusercontent.com/brando130/BiblicalDSS/main/biblical_dss_unicode.json"

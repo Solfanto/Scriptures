@@ -36,18 +36,19 @@ Prioritise critical editions and scholarly sources over devotional translations:
 - [ ] Original languages: Westminster Leningrad Codex (Hebrew), LXX (Septuagint)
 - [x] Strongs lexicon (Hebrew & Greek) — 8,674 Hebrew + 5,523 Greek entries from OpenScriptures
 - [x] Dead Sea Scrolls (public domain transcriptions) — 266 manuscripts, 11,711 passage variants from BiblicalDSS (CC BY-NC 4.0)
-- [ ] Codex Sinaiticus and Vaticanus (digitised, public domain)
+- [x] Codex Sinaiticus and Vaticanus (digitised, public domain) — Manuscript records with facsimile URLs (codexsinaiticus.org, digi.vatlib.it) plus a curated set of well-documented variants (Mark 16:9–20, John 7:53–8:11, Comma Johanneum, Mark 1:1) seeded via `rake import:manuscripts`
 
 **Quran**
 - [x] Tanzil.net source (Arabic + translations) — Arabic, Sahih International, Yusuf Ali, Pickthall (6,236 ayahs each)
 - [x] Translations: Yusuf Ali, Pickthall, Sahih International — all three imported
-- [ ] Sana'a manuscript variants (earliest extant Quran fragments)
+- [x] Sana'a manuscript variants (earliest extant Quran fragments) — Codex San'a 1 lower text (scriptio inferior, pre-Uthmanic) and upper text seeded as Manuscript records with facsimile_url and a sample of variants from Sadeghi & Goudarzi 2012, via `rake import:manuscripts`
 
 **Hadith**
 - [x] Hadith collections (AhmedBaset/hadith-json) — 17 collections imported: 9 major books (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, Malik, Ahmad, Darimi), 3 forty-hadith compilations (Nawawi, Qudsi, Shah Waliullah), 5 supplementary books (Al-Adab Al-Mufrad, Bulugh Al-Maram, Mishkat Al-Masabih, Riyad As-Salihin, Shamail Muhammadiyah) — ~50,884 hadiths, Arabic + English
 - [x] Sira (biography of the Prophet) — Ibn Ishaq/Ibn Hisham's Sirat Rasul Allah, Abdus-Salam M. Harun abridgement from Internet Archive DjVu text (copyright status unclear; original Arabic 9th century is public domain)
+- [x] Sira — Ibn Kathir's Al-Sira al-Nabawiyya (14th c. Arabic, public domain) imported via `rake import:ibn_kathir_sira`; Arabic only, since Trevor Le Gassick's English translation (1998–2000) is under copyright
 - [x] Tafsir (Quranic exegesis) — Ibn Kathir (English), Al-Jalalayn (English), Al-Tabari (Arabic) imported as Commentary records linked to Quran passages via spa5k/tafsir_api (27 editions available, 3 imported initially)
-- [ ] Fiqh texts — OpenITI corpus has 776 fiqh texts (255M words), needs format investigation
+- [x] Fiqh texts — OpenITI mARkdown importer (`Import::Fiqh`) handling `#`/`##`/`###` headings and `#~~` paragraph milestones; al-Shafi'i's al-Risala (c. 820 CE) wired up via `rake import:fiqh_risala` as the seed work for the Fiqh corpus
 
 **Pali Canon**
 - [x] SuttaCentral data (JSON) — Dhammapada imported (423 verses, Pali + Bhikkhu Sujato English)
@@ -89,7 +90,7 @@ Prioritise critical editions and scholarly sources over devotional translations:
 **Other traditions**
 - [ ] Identify reliable public domain sources for each corpus listed in the README
 - [ ] Prefer critical editions with manuscript notes over popular devotional editions
-- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, mesopotamian, celtic, norse
+- [x] Write an importer rake task per source format — bible_json, quran_tanzil, sblgnt, strongs, suttacentral, hadith, tafsir, sira, ibn_kathir_sira, fiqh, manuscripts, mesopotamian, celtic, norse
 
 ### 1.3 Import pipeline
 

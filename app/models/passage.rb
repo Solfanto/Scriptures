@@ -32,6 +32,8 @@ class Passage < ApplicationRecord
   has_many :curriculum_items, dependent: :destroy
   has_many :reading_progresses, dependent: :destroy
 
+  before_validation :assign_position_in_scripture, on: :create
+
   default_scope { order(:position) }
 
   delegate :scripture, to: :division
@@ -58,6 +60,22 @@ class Passage < ApplicationRecord
       .where("translation_segments.start_position <= :p AND translation_segments.end_position >= :p",
              p: position_in_scripture)
       .distinct
+  end
+
+  # Mirrors the backfill in AddPositionInScriptureToPassages: for new passages, compute
+  # the next position_in_scripture by counting existing passages in the scripture.
+  # Each scripture's passages are numbered sequentially across all its divisions.
+  def assign_position_in_scripture
+    return if position_in_scripture.present?
+    return unless division
+
+    scripture_id = division.scripture_id
+    return unless scripture_id
+
+    last = Passage.joins(:division)
+      .where(divisions: { scripture_id: scripture_id })
+      .maximum(:position_in_scripture) || 0
+    self.position_in_scripture = last + 1
   end
 
   # Bulk-load covering segments for a set of passages × translations into each
