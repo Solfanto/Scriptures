@@ -102,6 +102,26 @@ namespace :import do
     RunImportJob.perform_now("manuscripts")
   end
 
+  desc "Generate Latin-script transliterations of original-language translations (Greek, Hebrew, Arabic)"
+  task transliterate: :environment do
+    RunImportJob.perform_now("transliterate")
+  end
+
+  desc "Seed Akkadian transliterations of opening lines for the Mesopotamian corpus"
+  task mesopotamian_original: :environment do
+    RunImportJob.perform_now("mesopotamian_original")
+  end
+
+  desc "Align Dead Sea Scrolls fragments to KJV English text as a DSS-EN translation"
+  task dss_translation: :environment do
+    RunImportJob.perform_now("dss_translation")
+  end
+
+  desc "Import the English translation pages from Macalister's Lebor Gabála Érenn (EU PD)"
+  task lebor_gabala_english: :environment do
+    RunImportJob.perform_now("lebor_gabala_english")
+  end
+
   desc "Import Epic of Gilgamesh from Thompson 1928 DjVu text"
   task :gilgamesh, [ :file ] => :environment do |_t, args|
     file = args[:file] || "db/seeds/sources/mesopotamian/gilgamesh_thompson.txt"

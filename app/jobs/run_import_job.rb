@@ -71,6 +71,17 @@ class RunImportJob < ApplicationJob
     ).run
     # Manuscript witnesses — Codex Sinaiticus, Vaticanus, San'a 1 lower & upper
     when "manuscripts" then Import::Manuscripts.new(progress: cb).run
+    # Latin-script transliterations of original-language translations
+    when "transliterate" then run_transliterate(cb)
+    # Akkadian originals (curated transliteration sample) for the Mesopotamian corpus
+    when "mesopotamian_original" then Import::MesopotamianOriginal.new(progress: cb).run
+    # English overlay for Dead Sea Scrolls fragments via the KJV Bible text
+    when "dss_translation" then Import::DssTranslation.new(progress: cb).run
+    # Lebor Gabála Érenn English translation (Macalister 1938–1956, EU PD since 2021)
+    when "lebor_gabala_english" then Import::LeborGabalaEnglish.new(
+      files: (1..5).map { |n| source("celtic/lebor_gabala_#{n}.txt") },
+      progress: cb
+    ).run
     # Strong's lexicon from OpenScriptures JS format
     when "strongs_hebrew" then Import::StrongsLexicon.new(file: source("strongs_hebrew.js"), language: "Hebrew", progress: cb).run
     when "strongs_greek" then Import::StrongsLexicon.new(file: source("strongs_greek.js"), language: "Greek", progress: cb).run
@@ -241,16 +252,55 @@ class RunImportJob < ApplicationJob
     cb.call(files.size, files.size)
   end
 
+  # Runs Import::Transliteration over each source translation that has a
+  # supported Latin-script transliteration target.
+  def run_transliterate(cb)
+    targets = transliteration_targets
+    return if targets.empty?
+
+    targets.each do |t|
+      Import::Transliteration.new(
+        translation: t[:source],
+        abbreviation: t[:abbreviation],
+        name: t[:name],
+        language: t[:language],
+        progress: cb
+      ).run
+    end
+  end
+
+  def transliteration_targets
+    pairs = []
+
+    if (sblgnt = Translation.find_by(abbreviation: "SBLGNT"))
+      pairs << { source: sblgnt, abbreviation: "SBLGNT-T",
+                 name: "SBLGNT (Latin transliteration)", language: "Greek" }
+    end
+
+    if (qar = Translation.find_by(abbreviation: "QAR"))
+      pairs << { source: qar, abbreviation: "QAR-T",
+                 name: "Quran (Latin transliteration)", language: "Arabic" }
+    end
+
+    Translation.joins(:corpus).where(corpora: { slug: "dead-sea-scrolls" }).find_each do |dss|
+      next if dss.abbreviation.end_with?("-T") || dss.abbreviation == "DSS-EN"
+      pairs << { source: dss, abbreviation: "#{dss.abbreviation}-T",
+                 name: "#{dss.name} (Latin transliteration)", language: "Hebrew" }
+    end
+
+    pairs
+  end
+
   # Import all available source data
   def run_all
     %w[
       bible_kjv bible_asv bible_ylt bible_darby
       quran_arabic quran_sahih quran_yusufali quran_pickthall tafsir
       sblgnt suttacentral hadith sira ibn_kathir_sira fiqh_risala dead_sea_scrolls
-      gilgamesh enuma_elish
-      mabinogion mabinogion_welsh tain tain_irish lebor_gabala
+      gilgamesh enuma_elish mesopotamian_original
+      mabinogion mabinogion_welsh tain tain_irish lebor_gabala lebor_gabala_english
       poetic_edda_old_norse poetic_edda prose_edda_old_norse prose_edda
-      strongs_hebrew strongs_greek manuscripts classify_translations
+      strongs_hebrew strongs_greek manuscripts dss_translation transliterate classify_translations
     ].each do |sub_key|
       sub_run = ImportRun.create!(key: sub_key)
       perform(sub_key, import_run: sub_run)

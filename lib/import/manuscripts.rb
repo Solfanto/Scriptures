@@ -127,18 +127,23 @@ module Import
 
     # Quran variants. Sample readings from the lower (pre-Uthmanic) text of
     # San'a 1, drawn from Sadeghi & Goudarzi 2012 (folios 5, 16, 22).
-    # Each variant references the canonical Uthmanic verse for comparison.
+    # Each variant carries the Arabic reading, a Latin-script transliteration,
+    # and an English gloss; the scholarly note follows.
     QURAN_VARIANTS = [
       {
         manuscript: :sanaa_lower, surah: 9, ayah: 33,
         text: "هو الذي ارسل رسوله بالهدى ودين الحق ليظهره على الدين كله",
-        notes: "Folio 22b. Lower text omits the standard reading's وكفى بالله شهيدا appended " \
-               "to the verse, ending instead with على الدين كله. Discussed in Sadeghi & " \
-               "Goudarzi 2012, p. 61."
+        transliteration: "huwa alladhī arsala rasūlahu bi-l-hudā wa-dīni l-ḥaqqi li-yuẓhirahu ʿalā l-dīni kullihi",
+        english: "He it is who sent His Messenger with the guidance and the religion of " \
+                 "truth, to make it prevail over every religion.",
+        notes: "Folio 22b. Lower text omits the standard reading's وكفى بالله شهيدا (\"and " \
+               "God suffices as witness\") at the end of the verse. Sadeghi & Goudarzi 2012, p. 61."
       },
       {
         manuscript: :sanaa_lower, surah: 2, ayah: 196,
         text: "واتموا الحج والعمرة لله",
+        transliteration: "wa-atimmū l-ḥajja wa-l-ʿumrata li-llāhi",
+        english: "And complete the pilgrimage and the lesser pilgrimage for God.",
         notes: "Folio 5a. The lower text's opening of Q 2:196 substitutes اتموا (\"complete\") " \
                "in a different orthography from the standard rasm; word order of the following " \
                "clause also varies. Sadeghi & Goudarzi 2012, pp. 41–42."
@@ -146,6 +151,9 @@ module Import
       {
         manuscript: :sanaa_lower, surah: 19, ayah: 8,
         text: "قال رب اني يكون لي غلام وكانت امراتي عاقرا وقد بلغت من الكبر عتيا",
+        transliteration: "qāla rabbi annā yakūnu lī ghulāmun wa-kānat imraʾatī ʿāqiran wa-qad balaghtu mina l-kibari ʿitiyyā",
+        english: "He said, \"My Lord, how shall I have a son when my wife is barren and I " \
+                 "have reached extreme old age?\"",
         notes: "Folio 16a. Lower text has a marginally different word ordering from the " \
                "Uthmanic recension at the close of the verse. Sadeghi & Goudarzi 2012, p. 55."
       }
@@ -233,9 +241,17 @@ module Import
 
       record = TextualVariant.find_or_initialize_by(passage: passage, manuscript: manuscript)
       record.text = variant[:text]
-      record.notes = variant[:notes]
+      record.notes = compose_quran_notes(variant)
       record.save!
       true
+    end
+
+    def compose_quran_notes(variant)
+      parts = []
+      parts << "Transliteration: #{variant[:transliteration]}" if variant[:transliteration].present?
+      parts << "English: #{variant[:english]}" if variant[:english].present?
+      parts << variant[:notes] if variant[:notes].present?
+      parts.join("\n\n")
     end
 
     def lookup_passage(corpus, scripture_slug, chapter, verse)
