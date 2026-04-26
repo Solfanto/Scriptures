@@ -34,14 +34,13 @@ class WordStudiesController < ApplicationController
   # rendered across English translations. Returns { most_common:, others: [] }.
   def build_translation_renderings(entry)
     # Sample up to 50 passages that contain this lemma
-    sample_tokens = entry.original_language_tokens.includes(passage: :passage_translations).limit(50)
+    sample_tokens = entry.original_language_tokens.includes(passage: { division: :scripture }).limit(50)
 
     word_counts = Hash.new(0)
 
     sample_tokens.each do |tok|
-      tok.passage.passage_translations.each do |pt|
-        next unless pt.translation_id # skip nil
-        words = pt.text.split(/\s+/)
+      tok.passage.covering_segments.each do |segment|
+        words = segment.text.split(/\s+/)
         # Approximate: grab the word at the same relative position
         idx = tok.position - 1
         word = words[idx] || words.last

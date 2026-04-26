@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: source_documents
+# Database name: primary
 #
 #  id               :bigint           not null, primary key
 #  abbreviation     :string

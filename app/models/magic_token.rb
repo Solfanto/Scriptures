@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: magic_tokens
+# Database name: primary
 #
 #  id            :bigint           not null, primary key
 #  browser_token :string           default(""), not null

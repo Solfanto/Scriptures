@@ -2,7 +2,7 @@ class RatingsController < ApplicationController
   require_authentication
 
   def create
-    rating = current_user.ratings.find_or_initialize_by(passage_translation_id: params[:passage_translation_id])
+    rating = current_user.ratings.find_or_initialize_by(translation_segment_id: params[:translation_segment_id])
     rating.score = params[:score]
 
     if rating.save

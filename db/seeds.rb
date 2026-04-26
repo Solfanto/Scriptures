@@ -250,9 +250,9 @@ unless Rails.env.production?
   ]
 
   gen_passages.each_with_index do |passage, i|
-    PassageTranslation.find_or_create_by!(passage: passage, translation: wlc) { |pt| pt.text = hebrew_texts[i] }
-    PassageTranslation.find_or_create_by!(passage: passage, translation: kjv) { |pt| pt.text = kjv_texts[i] }
-    PassageTranslation.find_or_create_by!(passage: passage, translation: lxx) { |pt| pt.text = lxx_texts[i] }
+    TranslationSegment.find_or_create_for_range(translation: wlc, start_passage: passage, end_passage: passage, text: hebrew_texts[i])
+    TranslationSegment.find_or_create_for_range(translation: kjv, start_passage: passage, end_passage: passage, text: kjv_texts[i])
+    TranslationSegment.find_or_create_for_range(translation: lxx, start_passage: passage, end_passage: passage, text: lxx_texts[i])
 
     # All Genesis 1:1-5 attributed to Priestly source
     PassageSourceDocument.find_or_create_by!(passage: passage, source_document: p_source)
@@ -326,7 +326,7 @@ end
 
 puts "Seeded #{Tradition.count} traditions, #{Corpus.count} corpora, #{Scripture.count} scriptures, " \
      "#{Division.count} divisions, #{Passage.count} passages, #{Translation.count} translations, " \
-     "#{PassageTranslation.count} passage translations, #{SourceDocument.count} source documents, " \
+     "#{TranslationSegment.count} translation segments, #{SourceDocument.count} source documents, " \
      "#{LexiconEntry.count} lexicon entries, #{OriginalLanguageToken.count} tokens, " \
      "#{Manuscript.count} manuscripts, #{TextualVariant.count} textual variants, " \
      "#{CompositionDate.count} composition dates."

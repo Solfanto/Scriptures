@@ -14,7 +14,7 @@ module Import
     #   Tradition "Celtic" → Corpus "Celtic Literature"
     #   → Scripture "Lebor Gabála Érenn"
     #   → Division (one per volume/part) → Passage (one per numbered paragraph)
-    #   → PassageTranslation (Old/Middle Irish)
+    #   → TranslationSegment (Old/Middle Irish)
 
     # Common English function words for language detection.
     # If >15% of a paragraph's words are English function words, skip it.
@@ -84,9 +84,9 @@ module Import
             p.position = passage_number
           end
 
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = para_text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: para_text
+          )
 
           done += 1
           @progress&.call(done, total_paragraphs) if done % 50 == 0

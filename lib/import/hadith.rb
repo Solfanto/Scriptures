@@ -11,7 +11,7 @@ module Import
     #
     # Mapping:
     #   Corpus "Hadith" → Scripture (one per collection) → Division (one per chapter/kitab)
-    #   → Passage (one per hadith) → PassageTranslation (Arabic + English)
+    #   → Passage (one per hadith) → TranslationSegment (Arabic + English)
 
     COLLECTIONS = {
       # The nine major books
@@ -100,9 +100,9 @@ module Import
         # Arabic text
         arabic_text = h["arabic"]
         if arabic_text.present?
-          PassageTranslation.find_or_create_by!(passage: passage, translation: arabic_translation) do |pt|
-            pt.text = arabic_text.strip
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: arabic_translation, start_passage: passage, end_passage: passage, text: arabic_text.strip
+          )
         end
 
         # English text (narrator + text combined)
@@ -116,9 +116,9 @@ module Import
         end
 
         if english_text.present?
-          PassageTranslation.find_or_create_by!(passage: passage, translation: english_translation) do |pt|
-            pt.text = english_text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: english_translation, start_passage: passage, end_passage: passage, text: english_text
+          )
         end
 
         total += 1

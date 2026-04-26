@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: composition_dates
+# Database name: primary
 #
 #  id            :bigint           not null, primary key
 #  citation      :text

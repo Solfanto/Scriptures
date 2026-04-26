@@ -1,6 +1,6 @@
 <%= turbo_stream_from "llm_translations_#{@division.id}" %>
 
-<div class="dashboard">
+<div class="dashboard" data-controller="passage-range-select">
   <%# Header %>
   <div class="dashboard__header flex items-center justify-between">
     <div>
@@ -14,9 +14,27 @@
       <h1 class="dashboard__title"><%= @division.display_name %></h1>
     </div>
 
-    <%= button_to "Translate All", translate_admin_llm_translations_path(division_id: @division.id, style: @style, provider: @provider),
-          method: :post,
-          class: "px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors cursor-pointer" %>
+    <div class="flex items-center gap-2">
+      <%= form_tag translate_admin_llm_translations_path,
+            method: :post,
+            data: { passage_range_select_target: "rangeForm" },
+            class: "flex items-center gap-2" do %>
+        <%= hidden_field_tag :division_id, @division.id %>
+        <%= hidden_field_tag :style, @style %>
+        <%= hidden_field_tag :provider, @provider %>
+        <span data-passage-range-select-target="selectionLabel" class="text-xs text-slate-500 dark:text-slate-400 hidden">0 selected</span>
+        <button type="submit"
+                data-passage-range-select-target="rangeButton"
+                disabled
+                class="px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors">
+          Translate selected as range
+        </button>
+      <% end %>
+
+      <%= button_to "Translate All", translate_admin_llm_translations_path(division_id: @division.id, style: @style, provider: @provider),
+            method: :post,
+            class: "px-4 py-2 text-sm font-medium rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors cursor-pointer" %>
+    </div>
   </div>
 
   <%= render partial: "admin/application/notice", locals: { notice: } %>
@@ -45,8 +63,43 @@
     </div>
   </div>
 
+  <%# Existing range translations panel %>
+  <% if @range_segments.any? %>
+    <div class="mb-6 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-900/10 p-4">
+      <h2 class="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider mb-3">
+        Range translations (<%= @range_segments.size %>)
+      </h2>
+      <div class="space-y-3">
+        <% @range_segments.each do |segment| %>
+          <div class="bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                Verses <%= segment.start_passage.number %>–<%= segment.end_passage.number %>
+              </span>
+            </div>
+            <%= form_tag save_segment_admin_llm_translations_path, method: :patch do %>
+              <%= hidden_field_tag :start_passage_id, segment.start_passage_id %>
+              <%= hidden_field_tag :end_passage_id, segment.end_passage_id %>
+              <%= hidden_field_tag :style, @style %>
+              <div id="translation_segment_<%= segment.start_passage_id %>_<%= segment.end_passage_id %>_textarea_wrapper">
+                <textarea id="translation_segment_<%= segment.start_passage_id %>_<%= segment.end_passage_id %>_textarea"
+                          name="text"
+                          rows="<%= [ (segment.text.to_s.length / 80.0).ceil + 1, 3 ].max %>"
+                          class="w-full text-sm rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 px-3 py-2 leading-relaxed resize-y focus:ring-1 focus:ring-blue-500 focus:border-blue-500"><%= segment.text %></textarea>
+              </div>
+              <div class="flex justify-end mt-1.5">
+                <%= submit_tag "Save", class: "px-3 py-1 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors cursor-pointer" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <%# Column headers %>
-  <div class="grid grid-cols-[1fr_auto_1fr] gap-4 mb-3 px-1">
+  <div class="grid grid-cols-[auto_1fr_auto_1fr] gap-4 mb-3 px-1">
+    <span class="w-6"></span>
     <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
       Original<%= " (#{@source_translation.abbreviation})" if @source_translation %>
     </span>
@@ -60,11 +113,20 @@
   <div class="space-y-3">
     <% @passages.each do |passage| %>
       <% original_text = @originals[passage.id] %>
-      <% translated_text = @translations[passage.id] %>
+      <% translated_text = @single_passage_translations[passage.id] %>
 
-      <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+      <div class="grid grid-cols-[auto_1fr_auto_1fr] gap-4 items-start bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
 
-        <%# Original text (left) %>
+        <%# Selection checkbox %>
+        <div class="pt-3">
+          <input type="checkbox"
+                 value="<%= passage.id %>"
+                 data-passage-range-select-target="checkbox"
+                 data-action="click->passage-range-select#toggle"
+                 class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+        </div>
+
+        <%# Original text %>
         <div>
           <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500"><%= passage.number %></span>
           <% if original_text.present? %>
@@ -74,7 +136,7 @@
           <% end %>
         </div>
 
-        <%# Translate button (center) %>
+        <%# Translate button (single passage) %>
         <div class="flex flex-col items-center gap-2 pt-4">
           <%= button_to translate_admin_llm_translations_path(
                 division_id: @division.id, passage_id: passage.id, style: @style, provider: @provider
@@ -85,14 +147,16 @@
           <% end %>
         </div>
 
-        <%# Translation textarea + save (right) %>
+        <%# Translation textarea + save (single passage) %>
         <div>
           <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500"><%= passage.number %></span>
-          <%= form_tag save_passage_admin_llm_translations_path, method: :patch, class: "mt-0.5" do %>
-            <%= hidden_field_tag :passage_id, passage.id %>
+          <%= form_tag save_segment_admin_llm_translations_path, method: :patch, class: "mt-0.5" do %>
+            <%= hidden_field_tag :start_passage_id, passage.id %>
+            <%= hidden_field_tag :end_passage_id, passage.id %>
             <%= hidden_field_tag :style, @style %>
-            <div id="passage_<%= passage.id %>_translation">
-              <textarea name="text"
+            <div id="translation_segment_<%= passage.id %>_<%= passage.id %>_textarea_wrapper">
+              <textarea id="translation_segment_<%= passage.id %>_<%= passage.id %>_textarea"
+                        name="text"
                         rows="<%= [ (original_text.to_s.length / 80.0).ceil + 1, 3 ].max %>"
                         class="w-full text-sm rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 px-3 py-2 leading-relaxed resize-y focus:ring-1 focus:ring-blue-500 focus:border-blue-500"><%= translated_text %></textarea>
             </div>

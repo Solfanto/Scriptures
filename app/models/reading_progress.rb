@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: reading_progresses
+# Database name: primary
 #
 #  id                 :bigint           not null, primary key
 #  read_at            :datetime         not null

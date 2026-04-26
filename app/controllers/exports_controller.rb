@@ -10,10 +10,11 @@ class ExportsController < ApplicationController
 
     @divisions = @scripture.divisions
       .where(number: from_chapter..to_chapter)
-      .includes(passages: [ :passage_translations, :source_documents, :commentaries ])
+      .includes(passages: [ :source_documents, :commentaries ])
       .order(:position)
 
     @translations = resolve_export_translations
+    Passage.preload_texts!(@divisions.flat_map(&:passages), @translations.to_a)
     options = export_options
 
     respond_to do |format|
@@ -32,7 +33,7 @@ class ExportsController < ApplicationController
     end
 
     items = @collection.collection_passages.includes(
-      passage: [ :passage_translations, :source_documents, :commentaries, { division: { scripture: :corpus } } ]
+      passage: [ :source_documents, :commentaries, { division: { scripture: :corpus } } ]
     )
 
     options = export_options

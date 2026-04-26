@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: group_invitations
+# Database name: primary
 #
 #  id            :bigint           not null, primary key
 #  accepted_at   :datetime

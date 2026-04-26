@@ -95,26 +95,32 @@
         </div>
       <% else %>
         <%# Full-text / concordance results grouped by corpus %>
-        <% @results.group_by { |pt| pt.passage.division.scripture.corpus }.each do |corpus, pts| %>
+        <% @results.group_by { |seg| seg.start_passage.division.scripture.corpus }.each do |corpus, segments| %>
           <section class="space-y-4">
             <div class="flex items-center gap-4">
               <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400"><%= corpus.tradition.name %> / <%= corpus.name %></h3>
               <div class="h-px flex-1 bg-stone-100 dark:bg-stone-900"></div>
             </div>
             <div class="space-y-3">
-              <% pts.each do |pt| %>
-                <% passage = pt.passage %>
-                <% division = passage.division %>
+              <% segments.each do |segment| %>
+                <% start_passage = segment.start_passage %>
+                <% end_passage = segment.end_passage %>
+                <% division = start_passage.division %>
                 <% scripture = division.scripture %>
+                <% reference = if segment.single_passage?
+                                 "#{scripture.name.upcase} #{division.number}:#{start_passage.number}"
+                               else
+                                 "#{scripture.name.upcase} #{division.number}:#{start_passage.number}–#{end_passage.division.number}:#{end_passage.number}"
+                               end %>
                 <%= link_to reading_path(corpus_slug: corpus.slug, scripture_slug: scripture.slug, division_number: division.number),
                       class: "block space-y-1 group" do %>
                   <div class="flex items-center gap-2 text-[10px] font-bold text-stone-400 group-hover:text-blue-500 transition-colors">
-                    <span><%= scripture.name.upcase %> <%= division.number %>:<%= passage.number %></span>
+                    <span><%= reference %></span>
                     <%= chevron_right_icon %>
-                    <span><%= pt.translation.abbreviation %></span>
+                    <span><%= segment.translation.abbreviation %></span>
                   </div>
                   <p class="text-sm font-serif text-stone-600 dark:text-stone-400">
-                    <%= highlight(pt.text.truncate(300), @query, highlighter: '<span class="bg-amber-200/50 dark:bg-amber-900/50 px-0.5 rounded">\1</span>') %>
+                    <%= highlight(segment.text.truncate(300), @query, highlighter: '<span class="bg-amber-200/50 dark:bg-amber-900/50 px-0.5 rounded">\1</span>') %>
                   </p>
                 <% end %>
               <% end %>

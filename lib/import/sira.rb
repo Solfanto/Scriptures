@@ -10,7 +10,7 @@ module Import
     # Mapping:
     #   Corpus "Sira" → Scripture "Sirat Rasul Allah"
     #   → Division (top-level: Part I–VII) → Division (nested: sections)
-    #   → Passage (one per paragraph) → PassageTranslation (English)
+    #   → Passage (one per paragraph) → TranslationSegment (English)
 
     PARTS = [
       { number: 1, title: "The Prophet and the Arabian Peninsula Before the Mission" },
@@ -79,9 +79,9 @@ module Import
               p.position = passage_number
             end
 
-            PassageTranslation.find_or_create_by!(passage: passage, translation: english_translation) do |pt|
-              pt.text = text
-            end
+            TranslationSegment.find_or_create_for_range(
+              translation: english_translation, start_passage: passage, end_passage: passage, text: text
+            )
 
             total += 1
           end

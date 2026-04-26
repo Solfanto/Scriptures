@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: parallel_passages
+# Database name: primary
 #
 #  id                  :bigint           not null, primary key
 #  citation            :text

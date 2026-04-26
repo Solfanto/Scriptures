@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: commentaries
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  author          :string           not null

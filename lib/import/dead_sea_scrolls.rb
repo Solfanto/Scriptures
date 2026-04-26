@@ -55,9 +55,9 @@ module Import
             p.position = verse_num
           end
 
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = text.strip
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: text.strip
+          )
 
           TextualVariant.find_or_create_by!(passage: passage, manuscript: manuscript) do |v|
             v.text = text.strip

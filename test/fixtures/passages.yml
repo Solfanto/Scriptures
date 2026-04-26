@@ -2,13 +2,16 @@ genesis_one_one:
   division: genesis_one
   number: 1
   position: 1
+  position_in_scripture: 1
 
 genesis_one_two:
   division: genesis_one
   number: 2
   position: 2
+  position_in_scripture: 2
 
 genesis_one_three:
   division: genesis_one
   number: 3
   position: 3
+  position_in_scripture: 3

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: translations
+# Database name: primary
 #
 #  id           :bigint           not null, primary key
 #  abbreviation :string
@@ -25,7 +26,7 @@ class Translation < ApplicationRecord
   EDITION_TYPES = %w[critical devotional original].freeze
 
   belongs_to :corpus
-  has_many :passage_translations, dependent: :destroy
+  has_many :translation_segments, dependent: :destroy
 
   validates :name, presence: true
   validates :abbreviation, presence: true

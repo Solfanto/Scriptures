@@ -17,14 +17,14 @@ class SearchController < ApplicationController
   private
 
   def fulltext_search
-    return PassageTranslation.none if @query.blank?
+    return TranslationSegment.none if @query.blank?
 
     rank_sql = ActiveRecord::Base.sanitize_sql_array(
       [ "ts_rank(search_vector, websearch_to_tsquery('simple', ?)) DESC", @query ]
     )
-    scope = PassageTranslation
+    scope = TranslationSegment
       .where("search_vector @@ websearch_to_tsquery('simple', ?)", @query)
-      .includes(passage: { division: { scripture: { corpus: :tradition } } }, translation: {})
+      .includes(start_passage: { division: { scripture: { corpus: :tradition } } }, translation: {})
       .order(Arel.sql(rank_sql))
 
     scope = apply_scope_filter(scope)
@@ -33,12 +33,12 @@ class SearchController < ApplicationController
   end
 
   def concordance_search
-    return PassageTranslation.none if @query.blank?
+    return TranslationSegment.none if @query.blank?
 
-    scope = PassageTranslation
+    scope = TranslationSegment
       .where("search_vector @@ websearch_to_tsquery('simple', ?)", @query)
-      .includes(passage: { division: { scripture: { corpus: :tradition } } }, translation: {})
-      .order("passage_translations.id")
+      .includes(start_passage: { division: { scripture: { corpus: :tradition } } }, translation: {})
+      .order("translation_segments.id")
 
     scope = apply_scope_filter(scope)
     scope = scope.where(translations: { abbreviation: params[:translation] }) if params[:translation].present?
@@ -66,14 +66,14 @@ class SearchController < ApplicationController
   def apply_scope_filter(scope)
     case @scope
     when "tradition"
-      scope.joins(passage: { division: { scripture: { corpus: :tradition } } })
+      scope.joins(start_passage: { division: { scripture: { corpus: :tradition } } })
         .where(traditions: { slug: params[:tradition_slug] }) if params[:tradition_slug].present?
     when "corpus"
-      scope.joins(passage: { division: { scripture: :corpus } })
+      scope.joins(start_passage: { division: { scripture: :corpus } })
         .where(corpora: { slug: params[:corpus_slug] }) if params[:corpus_slug].present?
     when "annotations"
       if current_user
-        scope.joins(passage: :annotations)
+        scope.joins(start_passage: :annotations)
           .where(annotations: { user_id: current_user.id })
       else
         scope.none

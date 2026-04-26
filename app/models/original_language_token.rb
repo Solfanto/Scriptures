@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: original_language_tokens
+# Database name: primary
 #
 #  id               :bigint           not null, primary key
 #  lemma            :string

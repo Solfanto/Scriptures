@@ -14,7 +14,7 @@ class ConcordancesController < ApplicationController
         scripture_slug: scripture.slug,
         division_number: passage.division.number,
         text: token.text,
-        context: passage.passage_translations.first&.text&.truncate(120)
+        context: passage.covering_segments.first&.text&.truncate(120)
       }
     end
 

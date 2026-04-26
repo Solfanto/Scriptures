@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: featured_passages
+# Database name: primary
 #
 #  id           :bigint           not null, primary key
 #  active_from  :date             not null

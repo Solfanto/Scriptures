@@ -98,27 +98,61 @@
         </div>
         <div class="space-y-8">
           <% @passages.each do |passage| %>
+            <% left_seg = passage.covering_segment(@diff_left) %>
+            <% right_seg = passage.covering_segment(@diff_right) %>
+            <% left_role = segment_render_role(passage, @diff_left) %>
+            <% right_role = segment_render_role(passage, @diff_right) %>
+            <% has_range = (left_seg && !left_seg.single_passage?) || (right_seg && !right_seg.single_passage?) %>
+            <% next if has_range && left_role == :continuation && right_role == :continuation %>
             <div class="flex gap-4">
               <span class="text-xs font-mono text-stone-400 mt-1 w-4 shrink-0"><%= passage.number %></span>
               <div class="flex-1 text-base leading-relaxed">
-                <% left_text = passage.text_for(@diff_left) %>
-                <% right_text = passage.text_for(@diff_right) %>
-                <% if left_text.present? && right_text.present? %>
-                  <% translation_diff(left_text, right_text).each do |change| %>
-                    <% case change[:type] %>
-                    <% when :equal %>
-                      <span><%= change[:text] %> </span>
-                    <% when :deletion %>
-                      <span class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 line-through px-0.5 rounded"><%= change[:text] %> </span>
-                    <% when :addition %>
-                      <span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-0.5 rounded"><%= change[:text] %> </span>
-                    <% when :change %>
-                      <span class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 line-through px-0.5 rounded"><%= change[:old_text] %> </span>
-                      <span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-0.5 rounded"><%= change[:new_text] %> </span>
-                    <% end %>
-                  <% end %>
+                <% if has_range %>
+                  <div class="text-[10px] uppercase tracking-wider text-stone-400 mb-2">
+                    Range translation — verse-level diff not available
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
+                        <%= @diff_left.abbreviation %><% if left_seg && !left_seg.single_passage? %> · <%= segment_range_label(left_seg) %><% end %>
+                      </div>
+                      <% if left_role == :anchor %>
+                        <p class="text-stone-700 dark:text-stone-300"><%= left_seg.text %></p>
+                      <% else %>
+                        <p class="text-stone-400 italic">Not present</p>
+                      <% end %>
+                    </div>
+                    <div>
+                      <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
+                        <%= @diff_right.abbreviation %><% if right_seg && !right_seg.single_passage? %> · <%= segment_range_label(right_seg) %><% end %>
+                      </div>
+                      <% if right_role == :anchor %>
+                        <p class="text-stone-700 dark:text-stone-300"><%= right_seg.text %></p>
+                      <% else %>
+                        <p class="text-stone-400 italic">Not present</p>
+                      <% end %>
+                    </div>
+                  </div>
                 <% else %>
-                  <span class="text-stone-400 italic">No text available for both translations.</span>
+                  <% left_text = passage.text_for(@diff_left) %>
+                  <% right_text = passage.text_for(@diff_right) %>
+                  <% if left_text.present? && right_text.present? %>
+                    <% translation_diff(left_text, right_text).each do |change| %>
+                      <% case change[:type] %>
+                      <% when :equal %>
+                        <span><%= change[:text] %> </span>
+                      <% when :deletion %>
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 line-through px-0.5 rounded"><%= change[:text] %> </span>
+                      <% when :addition %>
+                        <span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-0.5 rounded"><%= change[:text] %> </span>
+                      <% when :change %>
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 line-through px-0.5 rounded"><%= change[:old_text] %> </span>
+                        <span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-0.5 rounded"><%= change[:new_text] %> </span>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-stone-400 italic">No text available for both translations.</span>
+                  <% end %>
                 <% end %>
               </div>
             </div>
@@ -140,8 +174,9 @@
 
         <div class="space-y-6">
           <% @passages.each do |passage| %>
-            <% texts = @selected_translations.map { |t| passage.text_for(t) } %>
-            <% has_missing = texts.any?(&:blank?) && texts.any?(&:present?) %>
+            <% segments = @selected_translations.map { |t| passage.covering_segment(t) } %>
+            <% roles = @selected_translations.map { |t| segment_render_role(passage, t) } %>
+            <% has_missing = segments.any?(&:blank?) && segments.any?(&:present?) %>
             <% has_variants = passage.textual_variants.any? %>
             <div class="flex gap-4 <%= 'border-l-2 border-amber-400 pl-2' if has_missing %>" data-controller="parallel-swipe">
               <div class="flex flex-col items-center gap-1">
@@ -150,17 +185,22 @@
                   <span class="w-4 text-center text-[8px] text-purple-500" title="Textual variants exist">V</span>
                 <% end %>
               </div>
-              <%# Mobile: horizontal scroll with snap; Desktop: grid columns %>
               <div data-parallel-swipe-target="container"
                    data-action="touchstart->parallel-swipe#touchstart touchmove->parallel-swipe#touchmove touchend->parallel-swipe#touchend"
                    class="flex-1 flex md:grid md:grid-cols-<%= [@selected_translations.size, 4].min %> gap-4 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth"
                    style="-webkit-overflow-scrolling: touch;">
                 <% @selected_translations.each_with_index do |t, i| %>
+                  <% seg = segments[i] %>
+                  <% role = roles[i] %>
                   <div class="min-w-full md:min-w-0 snap-start">
-                    <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1"><%= t.abbreviation %></div>
-                    <% if texts[i].present? %>
+                    <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
+                      <%= t.abbreviation %><% if seg && !seg.single_passage? && role == :anchor %> <span class="text-emerald-500/80 normal-case">· <%= segment_range_label(seg) %></span><% end %>
+                    </div>
+                    <% if role == :anchor %>
                       <% is_rtl = t.language.in?(%w[Hebrew Arabic]) %>
-                      <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300 <%= 'rtl text-right' if is_rtl %>"><%= texts[i] %></p>
+                      <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300 <%= 'rtl text-right' if is_rtl %>"><%= seg.text %></p>
+                    <% elsif role == :continuation %>
+                      <p class="text-xs text-stone-400 italic">part of <%= segment_range_label(seg) %> above</p>
                     <% else %>
                       <p class="text-sm text-amber-500 dark:text-amber-400 italic">Not present in this version</p>
                     <% end %>
@@ -187,40 +227,56 @@
                 <span class="text-xs font-mono text-stone-400 mt-2 w-4 shrink-0"><%= passage.number %></span>
                 <div class="space-y-4 flex-1">
                   <% @selected_translations.each_with_index do |t, i| %>
-                    <% text = passage.text_for(t) %>
-                    <% next unless text %>
+                    <% segment = passage.covering_segment(t) %>
+                    <% role = segment_render_role(passage, t) %>
+                    <% next unless role %>
                     <% is_rtl = t.language.in?(%w[Hebrew Arabic]) %>
+                    <% text = segment.text %>
                     <% if i == 0 %>
                       <%# Primary text with source criticism coloring %>
                       <% source = passage.source_documents.first %>
                       <% source_color = source_text_class(source&.color) %>
-                      <div class="flex items-start gap-2">
-                        <p class="scripture-text text-2xl md:text-3xl <%= source_color %> <%= 'rtl text-right' if is_rtl %> flex-1">
-                          <% text.split(/\s+/).each_with_index do |word, wi| %>
-                            <span class="hover:bg-stone-200 dark:hover:bg-stone-800 px-1 rounded cursor-help transition-colors inline-block"
-                                  data-action="mouseenter->word-tooltip#show mouseleave->word-tooltip#hide"
-                                  data-word="<%= word %>"
-                                  data-passage-id="<%= passage.id %>"
-                                  data-position="<%= wi + 1 %>"><%= word %> </span>
-                          <% end %>
-                        </p>
-                        <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
-                            <%= speaker_icon %>
-                          </button>
-                        </span>
-                      </div>
+                      <% if role == :continuation %>
+                        <p class="text-sm text-stone-400 italic">↑ part of <%= segment_range_label(segment) %> above</p>
+                      <% else %>
+                        <% if !segment.single_passage? %>
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1"><%= segment_range_label(segment) %> · range translation</div>
+                        <% end %>
+                        <div class="flex items-start gap-2">
+                          <p class="scripture-text text-2xl md:text-3xl <%= source_color %> <%= 'rtl text-right' if is_rtl %> flex-1">
+                            <% text.split(/\s+/).each_with_index do |word, wi| %>
+                              <span class="hover:bg-stone-200 dark:hover:bg-stone-800 px-1 rounded cursor-help transition-colors inline-block"
+                                    data-action="mouseenter->word-tooltip#show mouseleave->word-tooltip#hide"
+                                    data-word="<%= word %>"
+                                    data-passage-id="<%= passage.id %>"
+                                    data-position="<%= wi + 1 %>"><%= word %> </span>
+                            <% end %>
+                          </p>
+                          <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                              <%= speaker_icon %>
+                            </button>
+                          </span>
+                        </div>
+                      <% end %>
                     <% else %>
-                      <div class="flex items-start gap-2">
-                        <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 <%= 'rtl text-right' if is_rtl %> flex-1">
-                          <%= text %>
-                        </p>
-                        <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
-                            <%= speaker_icon(size: 12) %>
-                          </button>
-                        </span>
-                      </div>
+                      <% if role == :continuation %>
+                        <p class="text-xs text-stone-400 italic">↑ part of <%= segment_range_label(segment) %> above (<%= t.abbreviation %>)</p>
+                      <% else %>
+                        <% if !segment.single_passage? %>
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-600/80 dark:text-emerald-400/80"><%= t.abbreviation %> · <%= segment_range_label(segment) %></div>
+                        <% end %>
+                        <div class="flex items-start gap-2">
+                          <p class="scripture-text text-base md:text-lg text-stone-600 dark:text-stone-400 <%= 'rtl text-right' if is_rtl %> flex-1">
+                            <%= text %>
+                          </p>
+                          <span data-tooltip="Read aloud (<%= t.abbreviation %>)" data-controller="tts" data-tts-text-value="<%= text %>" data-tts-lang-value="<%= t.language %>" class="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button data-action="click->tts#speak" class="text-stone-300 dark:text-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                              <%= speaker_icon(size: 12) %>
+                            </button>
+                          </span>
+                        </div>
+                      <% end %>
                     <% end %>
                   <% end %>
                   <%# Passage action toolbar — single row %>

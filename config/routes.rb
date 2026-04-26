@@ -102,7 +102,7 @@ Rails.application.routes.draw do
     resources :llm_translations, only: [ :index, :show ] do
       collection do
         post :translate
-        patch :save_passage
+        patch :save_segment
       end
     end
 

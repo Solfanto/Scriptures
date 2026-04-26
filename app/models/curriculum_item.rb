@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: curriculum_items
+# Database name: primary
 #
 #  id            :bigint           not null, primary key
 #  notes         :text

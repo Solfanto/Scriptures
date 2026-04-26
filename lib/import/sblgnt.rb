@@ -88,9 +88,9 @@ module Import
           end
 
           assembled_text = words.join(" ")
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = assembled_text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: assembled_text
+          )
 
           total_passages += 1
         end

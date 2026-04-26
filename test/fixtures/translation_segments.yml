@@ -1,14 +1,26 @@
 genesis_one_one_kjv:
-  passage: genesis_one_one
   translation: kjv
+  scripture: genesis
+  start_passage: genesis_one_one
+  end_passage: genesis_one_one
+  start_position: 1
+  end_position: 1
   text: "In the beginning God created the heaven and the earth."
 
 genesis_one_one_wlc:
-  passage: genesis_one_one
   translation: wlc
+  scripture: genesis
+  start_passage: genesis_one_one
+  end_passage: genesis_one_one
+  start_position: 1
+  end_position: 1
   text: "בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ׃"
 
 genesis_one_two_kjv:
-  passage: genesis_one_two
   translation: kjv
+  scripture: genesis
+  start_passage: genesis_one_two
+  end_passage: genesis_one_two
+  start_position: 2
+  end_position: 2
   text: "And the earth was without form, and void; and darkness was upon the face of the deep."

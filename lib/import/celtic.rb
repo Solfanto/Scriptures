@@ -9,7 +9,7 @@ module Import
     # Mapping:
     #   Tradition "Celtic" → Corpus "Celtic Literature" → Scripture
     #   → Division (one per tale/chapter) → Passage (one per paragraph)
-    #   → PassageTranslation
+    #   → TranslationSegment
 
     GUTENBERG_START = /\*{3}\s*START OF/i
     GUTENBERG_END = /\*{3}\s*END OF/i
@@ -74,9 +74,9 @@ module Import
             p.position = passage_number
           end
 
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = para_text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: para_text
+          )
 
           done += 1
           @progress&.call(done, total_paragraphs) if done % 50 == 0

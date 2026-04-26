@@ -6,8 +6,12 @@ module Discover
       @passages_read = current_user.reading_progresses.count
       @total_time = current_user.reading_progresses.sum(:time_spent_seconds)
       @words_encountered = current_user.reading_progresses
-        .joins(passage: :passage_translations)
-        .sum("array_length(string_to_array(passage_translations.text, ' '), 1)")
+        .joins("JOIN passages ON passages.id = reading_progresses.passage_id")
+        .joins("JOIN divisions ON divisions.id = passages.division_id")
+        .joins("JOIN translation_segments ON translation_segments.scripture_id = divisions.scripture_id " \
+               "AND translation_segments.start_position <= passages.position_in_scripture " \
+               "AND translation_segments.end_position >= passages.position_in_scripture")
+        .sum("array_length(string_to_array(translation_segments.text, ' '), 1)")
 
       @recent_reads = current_user.reading_progresses
         .includes(passage: { division: { scripture: :corpus } })

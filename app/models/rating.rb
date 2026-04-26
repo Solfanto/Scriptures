@@ -1,29 +1,30 @@
 # == Schema Information
 #
 # Table name: ratings
+# Database name: primary
 #
 #  id                     :bigint           not null, primary key
 #  score                  :integer          not null
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  passage_translation_id :bigint           not null
+#  translation_segment_id :bigint           not null
 #  user_id                :bigint           not null
 #
 # Indexes
 #
-#  index_ratings_on_passage_translation_id              (passage_translation_id)
+#  index_ratings_on_translation_segment_id              (translation_segment_id)
 #  index_ratings_on_user_id                             (user_id)
-#  index_ratings_on_user_id_and_passage_translation_id  (user_id,passage_translation_id) UNIQUE
+#  index_ratings_on_user_id_and_translation_segment_id  (user_id,translation_segment_id) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (passage_translation_id => passage_translations.id)
+#  fk_rails_...  (translation_segment_id => translation_segments.id)
 #  fk_rails_...  (user_id => users.id)
 #
 class Rating < ApplicationRecord
   belongs_to :user
-  belongs_to :passage_translation
+  belongs_to :translation_segment
 
   validates :score, presence: true, inclusion: { in: 1..5 }
-  validates :user_id, uniqueness: { scope: :passage_translation_id }
+  validates :user_id, uniqueness: { scope: :translation_segment_id }
 end

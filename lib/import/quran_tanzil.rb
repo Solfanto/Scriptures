@@ -56,9 +56,9 @@ module Import
           p.position = ayah_num
         end
 
-        PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-          pt.text = text.strip
-        end
+        TranslationSegment.find_or_create_for_range(
+          translation: translation, start_passage: passage, end_passage: passage, text: text.strip
+        )
 
         total += 1
         @progress&.call(idx + 1, lines.size) if (idx + 1) % 500 == 0

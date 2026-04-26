@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: traditions
+# Database name: primary
 #
 #  id          :bigint           not null, primary key
 #  description :text

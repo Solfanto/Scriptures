@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: group_activities
+# Database name: primary
 #
 #  id             :bigint           not null, primary key
 #  action         :string           not null

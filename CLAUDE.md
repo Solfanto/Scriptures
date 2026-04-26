@@ -25,17 +25,19 @@ bin/rails db:seed          # seed traditions, corpora, scriptures, and Genesis 1
 
 ### Data model
 
-Tradition → Corpus → Scripture → Division → Passage → PassageTranslation
+Tradition → Corpus → Scripture → Division → Passage; text via TranslationSegment (range-based)
 
 - `Tradition` — religious tradition (Jewish, Christian, Islamic, Ancient & Historical)
 - `Corpus` — top-level grouping within a tradition (Bible, New Testament, Quran)
 - `Scripture` — a named text within a corpus (Genesis, Matthew)
 - `Division` — recursive (self-referential via `parent_id`) for chapters, books, parts
-- `Passage` — the atomic unit of text (verse, stanza, line)
+- `Passage` — the atomic unit of text (verse, stanza, line); carries `position_in_scripture` for range comparisons
 - `Translation` — a named version of a corpus in a given language (KJV, WLC, LXX)
-- `PassageTranslation` — the translated text of a passage in a specific translation
+- `TranslationSegment` — the translated text covering a contiguous range of passages (`start_passage`..`end_passage`); single-passage segments have start = end, range segments cover summaries/pericopes
 - `SourceDocument` — hypothetical source layers (J, E, D, P) with color coding
 - `PassageSourceDocument` — join table linking passages to source documents
+
+See [docs/DATA_MODEL.md](docs/DATA_MODEL.md) for the full data model.
 
 ### Routes
 

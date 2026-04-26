@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: passkey_credentials
+# Database name: primary
 #
 #  id          :bigint           not null, primary key
 #  label       :string

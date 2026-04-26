@@ -124,6 +124,10 @@ The primary audience is atheist religion scholars: academics and researchers who
 - Prose Edda & Poetic Edda (Norse)
 - Popol Vuh (Maya)
 
+## Documentation
+
+- [Data model](docs/DATA_MODEL.md) — how traditions, scriptures, passages, and translations are organized in the database
+
 ## Requirements
 
 - Ruby 4

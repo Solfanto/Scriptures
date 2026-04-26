@@ -57,14 +57,14 @@ module Import
           p.position = verse_num
         end
 
-        PassageTranslation.find_or_create_by!(passage: passage, translation: pali_translation) do |pt|
-          pt.text = pali_text
-        end
+        TranslationSegment.find_or_create_for_range(
+          translation: pali_translation, start_passage: passage, end_passage: passage, text: pali_text
+        )
 
         if en_translation && en_verses[verse_num]
-          PassageTranslation.find_or_create_by!(passage: passage, translation: en_translation) do |pt|
-            pt.text = en_verses[verse_num]
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: en_translation, start_passage: passage, end_passage: passage, text: en_verses[verse_num]
+          )
         end
 
         total += 1

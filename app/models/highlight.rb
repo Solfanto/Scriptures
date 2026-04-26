@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: highlights
+# Database name: primary
 #
 #  id             :bigint           not null, primary key
 #  color          :string           not null

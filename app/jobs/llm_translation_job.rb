@@ -35,28 +35,25 @@ class LlmTranslationJob < ApplicationJob
 
   DEFAULT_PROVIDER = "chatgpt"
 
-  def perform(passage_id:, style:, provider: DEFAULT_PROVIDER, source_translation_id: nil)
-    passage = Passage.find(passage_id)
+  def perform(start_passage_id:, end_passage_id:, style:, provider: DEFAULT_PROVIDER, source_translation_id: nil)
+    start_passage = Passage.find(start_passage_id)
+    end_passage = Passage.find(end_passage_id)
     style_config = STYLES.fetch(style)
     provider_config = PROVIDERS.fetch(provider, PROVIDERS[DEFAULT_PROVIDER])
-    scripture = passage.scripture
+    scripture = start_passage.scripture
     corpus = scripture.corpus
 
-    # Find original language text or fall back to specified translation
-    source_text = if source_translation_id
-      passage.text_for(Translation.find(source_translation_id))
+    source_translation = if source_translation_id
+      Translation.find(source_translation_id)
     else
-      passage.passage_translations
-        .joins(:translation).where(translations: { edition_type: "original" })
-        .first&.text
+      corpus.translations.find_by(edition_type: "original")
     end
 
+    return unless source_translation
+
+    source_text = collect_source_text(start_passage, end_passage, source_translation)
     return unless source_text.present?
 
-    source_translation = passage.translations.find_by(edition_type: "original") ||
-      Translation.find(source_translation_id)
-
-    # Build LLM translation
     translation = Translation.find_or_create_by!(
       abbreviation: "LLM-#{style_config[:abbreviation_suffix]}",
       corpus: corpus
@@ -67,21 +64,34 @@ class LlmTranslationJob < ApplicationJob
       t.description = "AI-generated translation using #{style} mode."
     end
 
-    prompt = build_prompt(passage, scripture, source_text, source_translation, style_config)
+    prompt = build_prompt(scripture, source_text, source_translation, style_config)
     generated_text = provider_config[:class_name].constantize.new.call(prompt)
 
     return unless generated_text.present?
 
-    pt = PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |record|
-      record.text = generated_text
-    end
+    segment = TranslationSegment.upsert_for_range(
+      translation: translation,
+      start_passage: start_passage,
+      end_passage: end_passage,
+      text: generated_text
+    )
 
-    broadcast_translation(passage, pt.text)
+    broadcast_translation(start_passage.division, segment)
   end
 
   private
 
-  def build_prompt(passage, scripture, source_text, source_translation, style_config)
+  def collect_source_text(start_passage, end_passage, source_translation)
+    scripture = start_passage.scripture
+    passages = Passage
+      .where(division_id: scripture.divisions.select(:id))
+      .where("position_in_scripture BETWEEN ? AND ?",
+             start_passage.position_in_scripture, end_passage.position_in_scripture)
+      .order(:position_in_scripture)
+    passages.map { |p| p.text_for(source_translation) }.compact.reject(&:blank?).join("\n")
+  end
+
+  def build_prompt(scripture, source_text, source_translation, style_config)
     <<~PROMPT
       You are a secular, historically-informed scripture translator. You are translating from #{source_translation.language} to English.
 
@@ -94,16 +104,16 @@ class LlmTranslationJob < ApplicationJob
     PROMPT
   end
 
-  def broadcast_translation(passage, text)
-    division = passage.division
+  def broadcast_translation(division, segment)
     stream_name = "llm_translations_#{division.id}"
-    escaped = ERB::Util.html_escape(text)
+    target = "translation_segment_#{segment.start_passage_id}_#{segment.end_passage_id}_textarea"
+    escaped = ERB::Util.html_escape(segment.text)
 
     Turbo::StreamsChannel.broadcast_replace_to(
       stream_name,
-      target: "passage_#{passage.id}_translation",
+      target: target,
       html: <<~HTML
-        <textarea name="text"
+        <textarea id="#{target}" name="text"
                   rows="3"
                   class="w-full text-sm rounded-md border border-emerald-300 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 text-slate-700 dark:text-slate-300 px-3 py-2 leading-relaxed resize-y focus:ring-1 focus:ring-blue-500 focus:border-blue-500">#{escaped}</textarea>
       HTML

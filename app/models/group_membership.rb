@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: group_memberships
+# Database name: primary
 #
 #  id         :bigint           not null, primary key
 #  role       :string           default("viewer"), not null

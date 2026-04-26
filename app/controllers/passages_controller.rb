@@ -13,14 +13,14 @@ class PassagesController < ApplicationController
 
     @tradition = @corpus.tradition
     @passages = @division.passages.includes(
-      :passage_translations, :translations, :source_documents,
-      :textual_variants, :original_language_tokens, :commentaries,
+      :source_documents, :textual_variants, :original_language_tokens, :commentaries,
       parallel_passages: { parallel_passage: { division: { scripture: :corpus } } }
-    )
+    ).to_a
     @translations = @corpus.translations.order(:language, :name)
     @source_documents = @corpus.source_documents
 
     @selected_translations = resolve_translations
+    Passage.preload_texts!(@passages, @translations)
 
     all_divisions = @scripture.divisions.reorder(:position)
     current_index = all_divisions.index(@division)

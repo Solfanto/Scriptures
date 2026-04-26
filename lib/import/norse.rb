@@ -10,7 +10,7 @@ module Import
     # Mapping:
     #   Tradition "Norse" → Corpus "Norse Mythology" → Scripture
     #   → Division (one per poem/section) → Passage (one per stanza/paragraph)
-    #   → PassageTranslation
+    #   → TranslationSegment
 
     GUTENBERG_START = /\*{3}\s*START OF/i
     GUTENBERG_END = /\*{3}\s*END OF/i
@@ -199,9 +199,9 @@ module Import
             p.position = passage_number
           end
 
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: text
+          )
 
           done += 1
           @progress&.call(done, total) if done % 50 == 0

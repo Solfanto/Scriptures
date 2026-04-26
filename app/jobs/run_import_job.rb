@@ -264,6 +264,6 @@ class RunImportJob < ApplicationJob
   end
 
   def total_record_count
-    PassageTranslation.count + Commentary.count + LexiconEntry.count + OriginalLanguageToken.count
+    TranslationSegment.count + Commentary.count + LexiconEntry.count + OriginalLanguageToken.count
   end
 end

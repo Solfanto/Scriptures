@@ -9,7 +9,7 @@ module Import
     # Mapping:
     #   Tradition "Mesopotamian" → Corpus → Scripture
     #   → Division (one per tablet) → Passage (one per verse line)
-    #   → PassageTranslation (English)
+    #   → TranslationSegment (English)
 
     TABLET_WORDS = %w[first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth].freeze
     TABLET_PATTERN = /\b(#{TABLET_WORDS.join("|")})\s+tablet\b/i
@@ -62,9 +62,9 @@ module Import
             p.position = passage_number
           end
 
-          PassageTranslation.find_or_create_by!(passage: passage, translation: translation) do |pt|
-            pt.text = line_text
-          end
+          TranslationSegment.find_or_create_for_range(
+            translation: translation, start_passage: passage, end_passage: passage, text: line_text
+          )
 
           done += 1
           @progress&.call(done, total_lines) if done % 50 == 0

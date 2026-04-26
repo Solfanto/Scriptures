@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: manuscripts
+# Database name: primary
 #
 #  id               :bigint           not null, primary key
 #  abbreviation     :string           not null
